@@ -1,8 +1,8 @@
 
-type RecordedData{S,T}
+type RecordedData{S,T,R}
     instance::T
     arrays::Dict{Symbol,Array}
-    steps::Range
+    steps::R
     idx::Int
     next::Int
 end
@@ -17,7 +17,6 @@ Recording `obj.a` and `obj.b` at timesteps 100 to 1000:
         record(r, step)
     end
 
-
 Accessing recorded data:
 
     r.arrays[:a]
@@ -27,22 +26,24 @@ Accessing timestamps:
     timestamps(r, dt)
 
 """
-function RecordedData(instance, steps::Range, vars...)
-    data = Dict()
+function RecordedData(instance, steps, fields...)
+    arrays = Dict()
     cols = length(steps)
-    for var in vars
-        field = getfield(instance, var)
-        if isa(field, AbstractArray)
+    for sym in fields
+        field = getfield(instance, sym)
+        # Initialise an array with the same datatype as the field
+        # we want to record, and an extra dimension corresponding
+        # to time:
+        if isa(field, AbstractArray) # array field
             arr = similar(field, (size(field)..., cols))
-        else
+        else # scalar field
             arr = Array(typeof(field), (1,cols))
         end
-        name = string(var)
-        data[var] = arr
+        arrays[sym] = arr
     end
-    array_types = Tuple{map(typeof, data)...}
-    println(array_types)
-    RecordedData{Val{vars}, typeof(instance)}(instance, data, steps, 0, Base.start(steps))
+    # We use the Val{} trick to store the field symbols in the type parameters. This allows
+    # the @generated functions below to specialise for a specific list of fields.
+    RecordedData{Val{fields}, typeof(instance), typeof(steps)}(instance, arrays, steps, 0, Base.start(steps))
 end
 
 """
@@ -52,7 +53,7 @@ function reset!(rec::RecordedData)
     rec.idx = 0
     rec.next = Base.start(rec.steps)
     for arr in values(rec.arrays)
-        arr[:] = 0.0
+        arr[:] = zero(eltype(arr))
     end
 end
 
