@@ -49,7 +49,7 @@ function RecordedData(instance, steps, fields...)
     # parameters. This allows the @generated record() function below
     # to specialise for a specific list of fields.
     return RecordedData{Val{fields}, typeof(instance), typeof(steps)}(
-                        instance, arrays, steps, 0, Base.start(steps))
+                        instance, arrays, steps, 0, start(steps))
 end
 
 """
@@ -57,7 +57,7 @@ Resets recorded data.
 """
 function reset!(rec::RecordedData)
     rec.idx = 0
-    rec.next = Base.start(rec.steps)
+    rec.next = start(rec.steps)
     for arr in values(rec.arrays)
         arr[:] = zero(eltype(arr))
     end
@@ -74,7 +74,7 @@ quoted(expr) = Expr(:quote, expr)
 """
 Signals that there is new data to be recorded for timestep `step`.
 """
-@generated function record{syms}(data::RecordedData{Val{syms}}, step)
+@generated function record!{syms}(data::RecordedData{Val{syms}}, step)
     println(syms)
     record_statements = []
     for var in syms
@@ -84,7 +84,7 @@ Signals that there is new data to be recorded for timestep `step`.
     end
     println(record_statements)
     quote
-        (step_idx, next_idx) = Base.next(data.steps, data.next)
+        (step_idx, next_idx) = next(data.steps, data.next)
         if step == step_idx
             data.next = next_idx
             data.idx += 1

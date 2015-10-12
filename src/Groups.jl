@@ -1,16 +1,16 @@
 
 
-@generated function start!(group)
+@generated function input_start!(group)
     subst = Dict()
     decls = []
     unpack_soa!(decls, subst, group, :group, :i, "")
-    update_expr = replace(start(group), subst)
+    update_expr = replace(input_start(group), subst)
     gen_func = gen_update(decls, update_expr, :group)
     println(gen_func)
     return gen_func
 end
 
-@generated function update(group, dt)
+@generated function update!(group, dt)
     subst = Dict()
     decls = []
     unpack_soa!(decls, subst, group, :group, :i, "")

@@ -12,7 +12,7 @@ end
 Base.size(r::RateInput, args...) = size(r.data, args...)
 Base.length(r::RateInput) = length(r.z)
 
-function start!(m::RateInput)
+function input_start!(m::RateInput)
 	m.step = 1 + (m.step % size(m.data,2))
     m.z = m.data[:,m.step]
 end

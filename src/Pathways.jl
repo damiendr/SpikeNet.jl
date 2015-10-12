@@ -10,11 +10,11 @@ type SparsePathway{P} <: Pathway
     learn::P
 end
 
-function route_rates(pre, path::Pathway, post)
+function route_rates!(pre, path::Pathway, post)
     on_rates!(post, path.W * pre.z)
 end
 
-@generated function route_spikes(pre, path::DensePathway, post)
+@generated function route_spikes!(pre, path::DensePathway, post)
     decls = []
     subst_pre = Dict()
     unpack_soa!(decls, subst_pre, pre, :pre, :i, "")
@@ -30,7 +30,7 @@ end
     return gen_func
 end
 
-@generated function learn{P}(pre, path::DensePathway{P}, post, post2)
+@generated function learn!{P}(pre, path::DensePathway{P}, post, post2)
     subst = Dict()
     decls = []
     unpack_soa!(decls, subst, pre, :pre, :i, "_pre")
