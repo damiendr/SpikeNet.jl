@@ -17,6 +17,9 @@ Recording `obj.a` and `obj.b` at timesteps 100 to 1000:
         record(r, step)
     end
 
+`steps` can be any `Iterable`, eg. a `Range` (`1:10:10000`)
+or `Array` of timesteps.
+
 Accessing recorded data:
 
     r.arrays[:a]
@@ -42,9 +45,11 @@ function RecordedData(instance, steps, fields...)
         arr[:] = zero(eltype(arr))
         arrays[sym] = arr
     end
-    # We use the Val{} trick to store the field symbols in the type parameters. This allows
-    # the @generated functions below to specialise for a specific list of fields.
-    RecordedData{Val{fields}, typeof(instance), typeof(steps)}(instance, arrays, steps, 0, Base.start(steps))
+    # We use the Val{} trick to store the field symbols in the type
+    # parameters. This allows the @generated record() function below
+    # to specialise for a specific list of fields.
+    return RecordedData{Val{fields}, typeof(instance), typeof(steps)}(
+                        instance, arrays, steps, 0, Base.start(steps))
 end
 
 """
