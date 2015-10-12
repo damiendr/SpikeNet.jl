@@ -23,7 +23,6 @@ learn(::Type{PreGatedMultQHebb}) = quote
     dw_plus = q_plus * x * (y >= θ)
     dw_min = q_min * x * (y < θ)
     w += dw_plus * (w_max - w) - dw_min * (w - w_min)
-#    w += dw_plus - dw_min
 end
 
 

@@ -26,7 +26,6 @@ end
     on_spike_expr = replace(on_spike(post), subst)
 
     gen_func = gen_dense_pathway(decls, spike_expr, on_spike_expr)
-    println(gen_func)
     return gen_func
 end
 
@@ -43,7 +42,6 @@ end
 
     learn_expr = replace(learn(P), subst)
     gen_func = gen_dense_pathway(decls, :true, learn_expr)
-    println(gen_func)
     return gen_func
 end
 

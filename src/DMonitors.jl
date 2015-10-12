@@ -75,14 +75,12 @@ quoted(expr) = Expr(:quote, expr)
 Signals that there is new data to be recorded for timestep `step`.
 """
 @generated function record!{syms}(data::RecordedData{Val{syms}}, step)
-    println(syms)
     record_statements = []
     for var in syms
         sym = quoted(var)
         rec = :(data.arrays[$sym][:,data.idx] = data.instance.$var)
         push!(record_statements, rec)
     end
-    println(record_statements)
     quote
         (step_idx, next_idx) = next(data.steps, data.next)
         if step == step_idx
