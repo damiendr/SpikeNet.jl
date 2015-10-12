@@ -19,7 +19,7 @@ function LIFSomas(n::Int; θ=0.8, ρ=0.1, τ=20e-3, g_leak=1.0)
 end
 
 input_start(::Type{LIFSomas}) = quote
-	Id = zero(Id)
+    Id = zero(Id)
     Is = zero(Is)
     z = zero(z)
 end

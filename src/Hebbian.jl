@@ -41,12 +41,12 @@ function OmegaThresholdHebb()
 end
 
 learn(::Type{OmegaThresholdHebb}) = quote
-        x = Float32(z_pre)
-        y = I_post
-        z = Float32(z_post)
-        ltp = q_ltp * (x >= θx) * (y >= θy) * (z >= θzplus)
-        ltd = q_ltd * (x >= θx) * (y >= θy) * (z >= θzmin) * (z < θzplus)
-        dec = q_dec * (x < θx) * (y >= θy)
-        dw = ltp - (ltd + dec)
-        w = w + dw
+    x = Float32(z_pre)
+    y = I_post
+    z = Float32(z_post)
+    ltp = q_ltp * (x >= θx) * (y >= θy) * (z >= θzplus)
+    ltd = q_ltd * (x >= θx) * (y >= θy) * (z >= θzmin) * (z < θzplus)
+    dec = q_dec * (x < θx) * (y >= θy)
+    dw = ltp - (ltd + dec)
+    w = w + dw
 end
