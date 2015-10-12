@@ -39,6 +39,7 @@ function RecordedData(instance, steps, fields...)
         else # scalar field
             arr = Array(typeof(field), (1,cols))
         end
+        arr[:] = zero(eltype(arr))
         arrays[sym] = arr
     end
     # We use the Val{} trick to store the field symbols in the type parameters. This allows
