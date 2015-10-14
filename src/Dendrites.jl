@@ -26,9 +26,7 @@ update(::Type{AdaptiveDendrites}) = quote
     I = (g > θ) * (I0 + Ig * g)
 end
 
-current(::Type{AdaptiveDendrites}) = quote
-    I
-end
+current(::Type{AdaptiveDendrites}) = :(I)
 
 on_spike(::Type{AdaptiveDendrites}) = quote
     g += w

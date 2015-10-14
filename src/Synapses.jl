@@ -15,9 +15,7 @@ update(::Type{ExponentialSynapses}) = quote
     g = g + dg * dt
 end
 
-current(::Type{ExponentialSynapses}) = quote
-    Ig * g
-end
+current(::Type{ExponentialSynapses}) = :(Ig * g)
 
 on_spike(::Type{ExponentialSynapses}) = quote
     g += w

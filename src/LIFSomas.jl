@@ -25,9 +25,9 @@ input_start(::Type{LIFSomas}) = quote
 end
 
 update(::Type{LIFSomas}) = quote
-    I_leak = -u * g_leak * (u > 0)
+    I_leak = -u * g_leak * (u > zero(u))
     dudt = (Id + Is + I_leak) / τ
-    u = u + dudt * dt
+    u = clamp(u + dudt * dt, zero(u), one(u))
 end
 
 spike(::Type{LIFSomas}) = :(u >= θ)
