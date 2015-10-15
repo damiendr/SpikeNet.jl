@@ -3,7 +3,7 @@
 Prints timing and vectorisation stats for each function call
 in the quoted block:
 
-@stats quote
+@stats begin
     f1()
     f2(a, b)
     ...
