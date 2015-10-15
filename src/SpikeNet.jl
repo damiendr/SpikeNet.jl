@@ -29,4 +29,6 @@ export record!, reset!, timestamps, RecordedData
 include("SpikeRecorder.jl")
 export record!, reset!, timestamps, RecordedSpikes
 
+include("Utils.jl")
+
 end

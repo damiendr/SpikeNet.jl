@@ -38,7 +38,7 @@ function RecordedData(instance, steps, fields...)
         # we want to record, and an extra dimension corresponding
         # to time:
         if isa(field, AbstractArray) # array field
-            arr = similar(field, (size(field)..., cols))
+            arr = similar(field, (length(field), cols))
         else # scalar field
             arr = Array(typeof(field), (1,cols))
         end
@@ -78,15 +78,15 @@ Signals that there is new data to be recorded for timestep `step`.
     record_statements = []
     for var in syms
         sym = quoted(var)
-        rec = :(data.arrays[$sym][:,data.idx] = data.instance.$var)
+        rec = :(data.arrays[$sym][:,data.idx] = data.instance.$var[:])
         push!(record_statements, rec)
     end
     quote
-        (step_idx, next_idx) = next(data.steps, data.next)
-        if step == step_idx
-            data.next = next_idx
+        if step == data.next
             data.idx += 1
             $(record_statements...)
+            (step_idx, next_idx) = next(data.steps, step)
+            data.next = next_idx
         end
     end
 end

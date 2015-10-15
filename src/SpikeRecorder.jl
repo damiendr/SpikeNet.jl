@@ -1,9 +1,9 @@
 
 type RecordedSpikes{T,R,TT,TI}
-    instance::T
-    steps::R
-    ts::Array{TT,1}
-    id::Array{TI,1}
+    instance::T # the object we're recording from
+    steps::R # the timesteps to record
+    ts::Array{TT,1} # timesteps of recorded spikes
+    id::Array{TI,1} # indices of recorded spikes
 end
 
 function choose_uint_type(max_val)
@@ -23,7 +23,7 @@ function RecordedSpikes(instance, steps)
         TT = eltype(steps)
     end
     TI = choose_uint_type(length(instance))
-    
+
     ts = Array(TT, 0)
     id = Array(TI, 0)
     RecordedSpikes{typeof(instance), typeof(steps), TT, TI}(
