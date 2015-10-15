@@ -18,10 +18,10 @@ Base.length(somas::LIFSomas) = length(somas.u)
 function LIFSomas(n::Int; kwargs...)
     Id = zeros(Float32, n)
     Is = zeros(Float32, n)
-    us = zeros(Float32, n)
-    zs = zeros(Int16, n)
-    rs = zeros(Int16, n)
-    LIFSomas(Id=Id, Is=Is, u=us, z=zs, r=rs; kwargs...)
+    u = zeros(Float32, n)
+    z = zeros(Int16, n)
+    r = zeros(Int16, n)
+    LIFSomas(Id=Id, Is=Is, u=u, z=z, r=r; kwargs...)
 end
 
 input_start(::Type{LIFSomas}) = quote
