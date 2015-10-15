@@ -1,10 +1,10 @@
 
-b(x) = Float32(x)
+using Parameters
 
 
-type PreGatedHebb
-    θ::Float32
-    μ::Float32
+@with_kw type PreGatedHebb
+    θ::Float32 = 0.5
+    μ::Float32 = 1e-3
 end
 
 learn(::Type{PreGatedHebb}) = quote
@@ -12,16 +12,12 @@ learn(::Type{PreGatedHebb}) = quote
     w = clamp(w + μ * dw, zero(w), one(w))
 end
 
-type PreGatedMultQHebb
-    θ::Float32
-    q_min::Float32
-    q_plus::Float32
-    w_min::Float32
-    w_max::Float32
-end
-
-function PreGatedMultQHebb(;θ=0.5, q_min=1e-3, q_plus=1e-3, w_min=0.0, w_max=1.0)
-    PreGatedMultQHebb(θ, q_min, q_plus, w_min, w_max)
+@with_kw type PreGatedMultQHebb
+    θ::Float32 = 0.5
+    q_min::Float32 = 1e-3
+    q_plus::Float32 = 1e-3
+    w_min::Float32 = 0.0
+    w_max::Float32 = 1.0
 end
 
 learn(::Type{PreGatedMultQHebb}) = quote
@@ -32,19 +28,14 @@ learn(::Type{PreGatedMultQHebb}) = quote
     w = w + dw_plus * (w_max - w) - dw_min * (w - w_min)
 end
 
-
-type OmegaThresholdHebb
-    θx::Float32
-    θy::Float32
-    θzplus::Float32
-    θzmin::Float32
-    q_ltp::Float32
-    q_ltd::Float32
-    q_dec::Float32
-end
-
-function OmegaThresholdHebb(;θx=0.5, θy=1.0, θzplus=3.0, θzmin=1.0, q_ltp=1e-3, q_ltd=1e-3, q_dec=1e-3)
-    OmegaThresholdHebb(θx, θy, θzplus, θzmin, q_ltp, q_ltd, q_dec)
+@with_kw type OmegaThresholdHebb
+    θx::Float32 = 0.5
+    θy::Float32 = 1.0
+    θzplus::Float32 = 3.0
+    θzmin::Float32 = 1.0
+    q_ltp::Float32 = 1e-3
+    q_ltd::Float32 = 1e-3
+    q_dec::Float32 = 1e-3
 end
 
 b(x) = Float32(x)

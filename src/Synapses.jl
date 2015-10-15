@@ -1,13 +1,15 @@
 
-type ExponentialSynapses
+using Parameters
+
+@with_kw type ExponentialSynapses
     g::Array{Float32,1}
-    τ::Float32
-    Ig::Float32
+    τ::Float32 = 5e-3
+    Ig::Float32 = 1.0
 end
 Base.length(s::ExponentialSynapses) = length(s.g)
 
-function ExponentialSynapses(n::Int; τ=5e-3, Ig=1.0)
-    ExponentialSynapses(zeros(Float32, n), τ, Ig)
+function ExponentialSynapses(n::Int; kwargs...)
+    ExponentialSynapses(g=zeros(Float32, n); kwargs...)
 end
 
 update(::Type{ExponentialSynapses}) = quote
