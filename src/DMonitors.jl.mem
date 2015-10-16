@@ -75,7 +75,7 @@
         - Signals that there is new data to be recorded for timestep `step`.
         - """
         - @generated function record!{syms}(data::RecordedData{Val{syms}}, step)
- 63967280     record_statements = []
+ 63967296     record_statements = []
         0     for var in syms
         0         sym = quoted(var)
         0         rec = :(data.arrays[$sym][:,data.idx] = data.instance.$var[:])

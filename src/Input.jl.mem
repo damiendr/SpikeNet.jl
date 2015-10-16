@@ -14,6 +14,10 @@
         - 
         - function input_start!(m::RateInput)
         0 	m.step = 1 + (m.step % size(m.data,2))
-  1903648     m.z = m.data[:,m.step]
+        0     z = m.z
+        0     data = m.data
+        0     @simd for i in 1:length(m.z)
+        0         @inbounds z[i] = data[i,m.step]
+        -     end
         - end
         - 

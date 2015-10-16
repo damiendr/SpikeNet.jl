@@ -38,7 +38,7 @@
         - end
         - 
         - @generated function record!{T}(data::RecordedSpikes{T}, step)
- 15991824     subst = Dict()
+ 15991808     subst = Dict()
         0     decls = []
         0     unpack_soa!(decls, subst, T, :group, :i, "")
         0     spike_expr = replace(spike(T), subst)
@@ -52,7 +52,7 @@
         0             id = data.id
         0             for i in 1:length(group)
         0                 @inbounds if $spike_expr
-    25632                     push!(ts, step)
+    33152                     push!(ts, step)
      2096                     push!(id, i)
         -                 end
         -             end
