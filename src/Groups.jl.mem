@@ -1,7 +1,7 @@
         - 
         - 
         - @generated function input_start!(group)
-  3806844     subst = Dict()
+  3801065     subst = Dict()
       128     decls = []
         0     unpack_soa!(decls, subst, group, :group, :i, "")
         0     update_expr = replace(input_start(group), subst)
@@ -10,7 +10,7 @@
         - end
         - 
         - @generated function update!(group, dt, step)
-  8232421     subst = Dict()
+  8165417     subst = Dict()
       384     decls = []
         0     unpack_soa!(decls, subst, group, :group, :i, "")
         0     update_expr = replace(update(group), subst)
@@ -20,7 +20,7 @@
         - end
         - 
         - @generated function reset!(group, dt)
-  1318127     subst = Dict()
+  1528838     subst = Dict()
       128     decls = []
         0     unpack_soa!(decls, subst, group, :group, :i, "")
         0     update_expr = replace(reset(group), subst)
@@ -52,8 +52,8 @@
         0         $(decls...)
         0         @simd for i in 1:length($group)
         0             @inbounds $do_expr
-        0         end
-        0     end
+     2416         end
+     2672     end
         0 end
         0 
         - 

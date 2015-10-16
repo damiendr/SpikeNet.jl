@@ -7,7 +7,7 @@
         - end
         - 
         - function RateInput(data)
-  2637504     RateInput(data, zeros(Float32, size(data, 1)), 1)
+  2637856     RateInput(data, zeros(Float32, size(data, 1)), 1)
         - end
         - Base.size(r::RateInput, args...) = size(r.data, args...)
         - Base.length(r::RateInput) = length(r.z)

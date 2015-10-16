@@ -30,7 +30,7 @@
         - 
         - """
         - function RecordedData(instance, steps, fields...)
- 24783836     arrays = Dict()
+ 24810220     arrays = Dict()
         0     cols = length(steps)
         0     for sym in fields
         0         field = getfield(instance, sym)

@@ -1,16 +1,16 @@
         - 
         - function replace(expr, subst; is_lhs=false)
-  3431610     try
-   290115         s = subst[expr]
+  5037879     try
+   430300         s = subst[expr]
         0         if isa(s, Tuple)
-    39279             lhs, rhs = s
+    38255             lhs, rhs = s
         -         else
         0             lhs = rhs = s
         -         end
         0         if is_lhs
         0             return lhs
         -         else
-     7312             return rhs
+     7216             return rhs
         -         end
         -     catch
         -         if isa(expr, Expr)
@@ -24,9 +24,9 @@
         0             args = map(expr.args) do arg
         0                 replace(arg, subst, is_lhs=is_lhs)
         -             end
-    69357             return Expr(expr.head, args...)
+    66797             return Expr(expr.head, args...)
         -         else
-        0             return expr
+      160             return expr
         -         end
         -     end
         - end
