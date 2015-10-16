@@ -10,7 +10,7 @@ type SparsePathway{P} <: Pathway
     learn::P
 end
 
-function route_rates!(pre, path::Pathway, post)
+@inline function route_rates!(pre, path::Pathway, post)
     Base.LinAlg.BLAS.gemv!('N', 1.0f0, path.W, pre.z, 0.0f0, post.g)
 end
 

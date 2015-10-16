@@ -84,7 +84,7 @@ Signals that there is new data to be recorded for timestep `step`.
     quote
         $(Expr(:meta, :inline))
         $(Expr(:meta, :fastmath))
-        if step == data.next
+        if step == data.next && !done(data.steps, step)
             data.idx += 1
             $(record_statements...)
             (step_idx, next_idx) = next(data.steps, step)
