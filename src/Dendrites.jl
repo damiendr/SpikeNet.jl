@@ -33,7 +33,4 @@ on_spike(::Type{AdaptiveDendrites}) = quote
     g += w
 end
 
-function on_rates!(dendrites::AdaptiveDendrites, x::Vector{Float32})
-    dendrites.g[:] = x
-end
 

@@ -14,5 +14,9 @@ Base.length(r::RateInput) = length(r.z)
 
 function input_start!(m::RateInput)
 	m.step = 1 + (m.step % size(m.data,2))
-    m.z = m.data[:,m.step]
+    z = m.z
+    data = m.data
+    @simd for i in 1:length(m.z)
+        @inbounds z[i] = data[i,m.step]
+    end
 end

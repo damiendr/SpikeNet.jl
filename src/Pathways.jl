@@ -11,7 +11,7 @@ type SparsePathway{P} <: Pathway
 end
 
 function route_rates!(pre, path::Pathway, post)
-    on_rates!(post, path.W * pre.z)
+    Base.LinAlg.BLAS.gemv!('N', 1.0f0, path.W, pre.z, 0.0f0, post.g)
 end
 
 @generated function route_spikes!(pre, path::DensePathway, post)
