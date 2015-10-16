@@ -48,6 +48,7 @@ end
 
 function gen_elemwise(decls, do_expr, group)
     quote
+        $(Expr(:meta, :inline))
         $(Expr(:meta, :fastmath))
         $(decls...)
         @simd for i in 1:length($group)

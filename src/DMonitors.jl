@@ -82,6 +82,8 @@ Signals that there is new data to be recorded for timestep `step`.
         push!(record_statements, rec)
     end
     quote
+        $(Expr(:meta, :inline))
+        $(Expr(:meta, :fastmath))
         if step == data.next
             data.idx += 1
             $(record_statements...)

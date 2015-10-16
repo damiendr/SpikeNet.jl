@@ -43,6 +43,8 @@ end
     unpack_soa!(decls, subst, T, :group, :i, "")
     spike_expr = replace(spike(T), subst)
     gen_func = quote
+        $(Expr(:meta, :inline))
+        $(Expr(:meta, :fastmath))
         if step in data.steps
             group = data.instance
             $(decls...)

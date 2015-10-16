@@ -45,11 +45,11 @@ update(::Type{LIFSomas}) = quote
     Ileak = -u * g_leak
     I = Id + Is + Ileak
     Itot += I
-    du = Float32(I) * dt/τ
+    du = I * dt/τ
     u = clamp(u + du, 0.0, 1.0)
 end
 
-spike(::Type{LIFSomas}) = :((u >= θ) && (r <= zero(r)))
+spike(::Type{LIFSomas}) = :((u >= θ) && (r <= 0))
 
 reset(::Type{LIFSomas}) = quote
     z = ifelse($(spike(LIFSomas)), z+1, z)
