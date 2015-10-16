@@ -1,0 +1,66 @@
+        - abstract Pathway
+        - 
+        - type DensePathway{P} <: Pathway
+   426876     W::Matrix{Float32}
+        -     learn::P
+        - end
+        - 
+        - type SparsePathway{P} <: Pathway
+        -     W::SparseMatrixCSC{Float32}
+        -     learn::P
+        - end
+        - 
+        - function route_rates!(pre, path::Pathway, post)
+  4780682     on_rates!(post, path.W * pre.z)
+        - end
+        - 
+        - @generated function route_spikes!(pre, path::DensePathway, post)
+   745464     decls = []
+      608     subst_pre = Dict()
+        0     unpack_soa!(decls, subst_pre, pre, :pre, :i, "")
+        0     spike_expr = replace(spike(pre), subst_pre)
+        - 
+      608     subst = Dict()
+        0     unpack_soa!(decls, subst, post, :post, :j, "")
+   681442     subst[:w] = :(w[j,i])
+        0     on_spike_expr = replace(on_spike(post), subst)
+        0 
+        0     gen_func = gen_dense_pathway(decls, spike_expr, on_spike_expr)
+        0 #    println(gen_func)
+        0     return gen_func
+        - end
+        - 
+        - @generated function learn!{P}(pre, path::DensePathway{P}, post, post2)
+  3109289     subst = Dict()
+      128     decls = []
+        0     unpack_soa!(decls, subst, pre, :pre, :i, "_pre")
+        0     unpack_soa!(decls, subst, post, :post, :j, "_post")
+    26672     if post2 != Void
+     2016         unpack_soa!(decls, subst, post2, :post2, :j, "_post")
+        -     end
+        0     unpack_soa!(decls, subst, P, :(path.learn), :idx, "")
+      256     subst[:w] = :(w[j,i])
+        0 
+        0     learn_expr = replace(learn(P), subst)
+        0     gen_func = gen_dense_pathway(decls, :true, learn_expr)
+        0     return gen_func
+        0 end
+        0 
+        0 function gen_dense_pathway(decls, test_expr, do_expr)
+   736301     quote
+        0         $(Expr(:meta, :fastmath))
+        0         @assert length(pre) == size(path.W, 2)
+        0         @assert length(post) == size(path.W, 1)
+        0         $(decls...)
+        0         w = path.W
+        0         for i in 1:length(pre)
+        0             @inbounds if $test_expr
+        0                 @simd for j in 1:length(post)
+        0                     $do_expr
+        -                 end
+        -             end
+        -         end
+        -     end
+        - end
+        0 
+        0 

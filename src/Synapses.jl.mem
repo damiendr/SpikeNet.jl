@@ -1,0 +1,43 @@
+        - 
+        - using Parameters
+        - 
+        - @with_kw type ExponentialInhSynapses
+        -     g::Array{Float32,1}
+        -     τ::Float32 = 5e-3
+        -     Ig::Float32 = -1.0
+        - end
+        - Base.length(s::ExponentialInhSynapses) = length(s.g)
+        - 
+        - function ExponentialInhSynapses(n::Int; kwargs...)
+   281238     ExponentialInhSynapses(g=zeros(Float32, n); kwargs...)
+        - end
+        - 
+    11468 update(::Type{ExponentialInhSynapses}) = quote
+        -     dg = -g/τ
+        -     g = g + dg * dt
+        - end
+        - 
+     8306 current(::Type{ExponentialInhSynapses}) = :(Ig * g * u_post)
+        - 
+     8773 on_spike(::Type{ExponentialInhSynapses}) = quote
+        -     g += w
+        - end
+        - 
+        - function on_spike(synapses::ExponentialInhSynapses, post_id::Int, w)
+        -     synapses.g[post_id] += w
+        - end
+        - 
+        - 
+        - @with_kw type ThetaSynapses
+        -     g_max::Float32 = -1.0
+        -     period::Float32 = 100.0
+        -     g::Float32 = 0.0
+        - end
+        - Base.length(s::ThetaSynapses) = 1
+        - 
+        - update(::Type{ThetaSynapses}) = quote
+        -     g = g_max * cos(π*Float32(step/period))^2
+        - end
+        - 
+        - current(::Type{ThetaSynapses}) = :(g * u_post)
+        - 

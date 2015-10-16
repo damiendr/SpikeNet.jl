@@ -1,0 +1,40 @@
+        - using Parameters
+        - 
+        - @with_kw type AdaptiveDendrites
+        -     g::Array{Float32,1} # total active conductance
+        -     θ::Array{Float32,1} # dendritic thresholds
+        -     I::Array{Float32,1} # dendritic current
+        -     θhyst::Float32 = 0.1 # threshold hysteresis
+        -     θmin::Float32 = 0.01 # min threshold
+        -     θmax::Float32 = Inf # max threshold
+        -     qplusθ::Float32 = 1e-3 # threshold increment
+        -     qminθ::Float32 = 1e-3 # threshold decrement
+        -     I0::Float32 = 1.0 # current bias
+        -     Ig::Float32 = 0.1 # current slope
+        - end
+        - Base.length(d::AdaptiveDendrites) = length(d.g)
+        - 
+        - function AdaptiveDendrites(n::Int; θ₀=1.0, kwargs...)
+   673432     g = zeros(Float32, n)
+     1792     θ = zeros(Float32, n) + θ₀
+      896     I = zeros(Float32, n)
+    36334     AdaptiveDendrites(g=g, θ=θ, I=I; kwargs...)
+        - end
+        - 
+    16619 update(::Type{AdaptiveDendrites}) = quote
+        -     I = (g > θ) * (I0 + Ig * g)
+        -     qθ = qplusθ * (g > (θ + θhyst)) - qminθ * (g < θ)
+        -     θ = clamp(θ + qθ, θmin, θmax)
+        - end
+        - 
+     7562 current(::Type{AdaptiveDendrites}) = :(I)
+        - 
+        - on_spike(::Type{AdaptiveDendrites}) = quote
+        -     g += w
+        - end
+        - 
+        - function on_rates!(dendrites::AdaptiveDendrites, x::Vector{Float32})
+        -     dendrites.g[:] = x
+        - end
+        - 
+        - 
