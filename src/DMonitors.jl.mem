@@ -1,6 +1,6 @@
         - 
         - type RecordedData{S,T,R}
-  2180525     instance::T
+        0     instance::T
         -     arrays::Dict{Symbol,Array}
         -     steps::R
         -     idx::Int
@@ -30,7 +30,7 @@
         - 
         - """
         - function RecordedData(instance, steps, fields...)
- 24783484     arrays = Dict()
+        0     arrays = Dict()
         0     cols = length(steps)
         0     for sym in fields
         0         field = getfield(instance, sym)
@@ -38,12 +38,12 @@
         -         # we want to record, and an extra dimension corresponding
         -         # to time:
         0         if isa(field, AbstractArray) # array field
-  7879984             arr = similar(field, (length(field), cols))
+        0             arr = similar(field, (length(field), cols))
         -         else # scalar field
         0             arr = Array(typeof(field), (1,cols))
         -         end
-   378372         arr[:] = zero(eltype(arr))
-    19168         arrays[sym] = arr
+        0         arr[:] = zero(eltype(arr))
+        0         arrays[sym] = arr
         -     end
         -     # We use the Val{} trick to store the field symbols in the type
         -     # parameters. This allows the @generated record() function below
@@ -75,20 +75,20 @@
         - Signals that there is new data to be recorded for timestep `step`.
         - """
         - @generated function record!{syms}(data::RecordedData{Val{syms}}, step)
- 66462743     record_statements = []
-      128     for var in syms
-      448         sym = quoted(var)
-     4096         rec = :(data.arrays[$sym][:,data.idx] = data.instance.$var[:])
-      192         push!(record_statements, rec)
+ 63967280     record_statements = []
+        0     for var in syms
+        0         sym = quoted(var)
+        0         rec = :(data.arrays[$sym][:,data.idx] = data.instance.$var[:])
+        0         push!(record_statements, rec)
         -     end
-    10880     quote
+        0     quote
         0         $(Expr(:meta, :inline))
         0         $(Expr(:meta, :fastmath))
         0         if step == data.next
         0             data.idx += 1
-  9353786             $(record_statements...)
+        0             $(record_statements...)
         0             (step_idx, next_idx) = next(data.steps, step)
-    65216             data.next = next_idx
+        0             data.next = next_idx
         -         end
         -     end
         - end

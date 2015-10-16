@@ -9,17 +9,17 @@
         - Base.length(s::ExponentialInhSynapses) = length(s.g)
         - 
         - function ExponentialInhSynapses(n::Int; kwargs...)
-   281238     ExponentialInhSynapses(g=zeros(Float32, n); kwargs...)
+        0     ExponentialInhSynapses(g=zeros(Float32, n); kwargs...)
         - end
         - 
-    10620 update(::Type{ExponentialInhSynapses}) = quote
+        0 update(::Type{ExponentialInhSynapses}) = quote
         -     dg = -g/τ
         -     g = g + dg * dt
         - end
         - 
-     8178 current(::Type{ExponentialInhSynapses}) = :(Ig * g * u_post)
+        0 current(::Type{ExponentialInhSynapses}) = :(Ig * g * u_post)
         - 
-     8773 on_spike(::Type{ExponentialInhSynapses}) = quote
+        0 on_spike(::Type{ExponentialInhSynapses}) = quote
         -     g += w
         - end
         - 

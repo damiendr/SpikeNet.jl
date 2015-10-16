@@ -20,7 +20,7 @@
         -     w_max::Float = 1.0
         - end
         - 
-    27076 learn{Float}(::Type{PreGatedMultQHebb{Float}}) = quote
+        0 learn{Float}(::Type{PreGatedMultQHebb{Float}}) = quote
         -     x = $Float(z_pre)
         -     y = $Float(z_post)
         -     dw_plus = q_plus * x * (y >= θ)
@@ -39,7 +39,7 @@
         -     q_dec::Float = 1e-3
         - end
         - 
-    33553 learn{Float}(::Type{OmegaThresholdHebb{Float}}) = quote
+        0 learn{Float}(::Type{OmegaThresholdHebb{Float}}) = quote
         -     x = $Float(z_pre)
         -     y = I_post
         -     z = $Float(z_post)

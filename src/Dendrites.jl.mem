@@ -15,19 +15,19 @@
         - Base.length(d::AdaptiveDendrites) = length(d.g)
         - 
         - function AdaptiveDendrites(n::Int; θ₀=1.0, kwargs...)
-   673432     g = zeros(Float32, n)
-     1792     θ = zeros(Float32, n) + θ₀
-      896     I = zeros(Float32, n)
-    36334     AdaptiveDendrites(g=g, θ=θ, I=I; kwargs...)
+        0     g = zeros(Float32, n)
+        0     θ = zeros(Float32, n) + θ₀
+        0     I = zeros(Float32, n)
+        0     AdaptiveDendrites(g=g, θ=θ, I=I; kwargs...)
         - end
         - 
-    14603 update(::Type{AdaptiveDendrites}) = quote
+        0 update(::Type{AdaptiveDendrites}) = quote
         -     I = (g > θ) * (I0 + Ig * g)
         -     qθ = qplusθ * (g > (θ + θhyst)) - qminθ * (g < θ)
         -     θ = clamp(θ + qθ, θmin, θmax)
         - end
         - 
-     7562 current(::Type{AdaptiveDendrites}) = :(I)
+        0 current(::Type{AdaptiveDendrites}) = :(I)
         - 
         - on_spike(::Type{AdaptiveDendrites}) = quote
         -     g += w

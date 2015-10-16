@@ -16,32 +16,32 @@
         - Base.length(somas::LIFSomas) = length(somas.u)
         - 
         - function gauss(T, n, μ, σ)
-     2688     arr = zeros(Float32, n)
-    19632     arr += randn(n) * σ + μ
+        0     arr = zeros(Float32, n)
+        0     arr += randn(n) * σ + μ
         - end
         - 
         - function LIFSomas(n::Int; μτ=10e-3, μθ=0.8, μρ=0.65, jitter=0.05, kwargs...)
- 14924378     Id = zeros(Float32, n)
-      896     Is = zeros(Float32, n)
-      896     Itot = zeros(Float32, n)
-      896     u = zeros(Float32, n)
-      448     z = zeros(Int16, n)
-      448     r = zeros(Int16, n)
+        0     Id = zeros(Float32, n)
+        0     Is = zeros(Float32, n)
+        0     Itot = zeros(Float32, n)
+        0     u = zeros(Float32, n)
+        0     z = zeros(Int16, n)
+        0     r = zeros(Int16, n)
         - 
         0     τ = gauss(Float32, n, μτ, jitter)
         0     θ = gauss(Float32, n, μθ, jitter)
         0     ρ = gauss(Float32, n, μρ, jitter)
         - 
-      608     LIFSomas(Id=Id, Is=Is, Itot=Itot, u=u, z=z, r=r, τ=τ, θ=θ, ρ=ρ; kwargs...)
+        0     LIFSomas(Id=Id, Is=Is, Itot=Itot, u=u, z=z, r=r, τ=τ, θ=θ, ρ=ρ; kwargs...)
         - end
         - 
-     9800 input_start(::Type{LIFSomas}) = quote
+        0 input_start(::Type{LIFSomas}) = quote
         -     Id = 0.0
         -     Itot = 0.0
         -     z = 0.0
         - end
         - 
-    13372 update(::Type{LIFSomas}) = quote
+        0 update(::Type{LIFSomas}) = quote
         -     Ileak = -u * g_leak
         -     I = Id + Is + Ileak
         -     Itot += I
@@ -49,9 +49,9 @@
         -     u = clamp(u + du, 0.0, 1.0)
         - end
         - 
-     3024 spike(::Type{LIFSomas}) = :((u >= θ) && (r <= 0))
+        0 spike(::Type{LIFSomas}) = :((u >= θ) && (r <= 0))
         - 
-    48044 reset(::Type{LIFSomas}) = quote
+        0 reset(::Type{LIFSomas}) = quote
         -     z = ifelse($(spike(LIFSomas)), z+1, z)
         -     r = ifelse($(spike(LIFSomas)), refrac, max(r-1, 0))
         -     u = ifelse($(spike(LIFSomas)), ρ, u)

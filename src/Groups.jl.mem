@@ -1,8 +1,8 @@
         - 
         - 
         - @generated function input_start!(group)
-  2025991     subst = Dict()
-       64     decls = []
+        0     subst = Dict()
+        0     decls = []
         0     unpack_soa!(decls, subst, group, :group, :i, "")
         0     update_expr = replace(input_start(group), subst)
         0     gen_func = gen_elemwise(decls, update_expr, :group)
@@ -10,8 +10,8 @@
         - end
         - 
         - @generated function update!(group, dt, step)
-  6968929     subst = Dict()
-      192     decls = []
+        0     subst = Dict()
+        0     decls = []
         0     unpack_soa!(decls, subst, group, :group, :i, "")
         0     update_expr = replace(update(group), subst)
         0     gen_func = gen_elemwise(decls, update_expr, :group)
@@ -20,8 +20,8 @@
         - end
         - 
         - @generated function reset!(group, dt)
-   812321     subst = Dict()
-       64     decls = []
+        0     subst = Dict()
+        0     decls = []
         0     unpack_soa!(decls, subst, group, :group, :i, "")
         0     update_expr = replace(reset(group), subst)
         0     gen_func = gen_elemwise(decls, update_expr, :group)
@@ -29,9 +29,9 @@
         - end
         - 
         - @generated function add_current!{sink_var}(sink, ::Type{Val{sink_var}}, source)
-  1392112     subst_source = Dict()
-     1216     subst_sink = Dict()
-      128     decls = []
+        0     subst_source = Dict()
+        0     subst_sink = Dict()
+        0     decls = []
         - 
         0     unpack_soa!(decls, subst_source, source, :source, :i, "")
         0     unpack_soa!(decls, subst_source, sink, :sink, :i, "_post")
@@ -40,14 +40,14 @@
         - 
         0     current_expr = replace(current(source), subst_source)
         0     sink_expr = replace(sink_var, subst_sink)
-      224     update_expr = :($sink_expr += $current_expr)
+        0     update_expr = :($sink_expr += $current_expr)
         0     gen_func = gen_elemwise(decls, update_expr, :sink)
         - #    println(gen_func)
         0     return gen_func
         - end
         - 
         - function gen_elemwise(decls, do_expr, group)
-   460521     quote
+        0     quote
         -         $(Expr(:meta, :inline))
         -         $(Expr(:meta, :fastmath))
         -         $(decls...)

@@ -1,15 +1,15 @@
         - 
         - type RecordedSpikes{T,R,TT,TI}
-   179452     instance::T # the object we're recording from
+        0     instance::T # the object we're recording from
         -     steps::R # the timesteps to record
         -     ts::Array{TT,1} # timesteps of recorded spikes
         -     id::Array{TI,1} # indices of recorded spikes
         - end
         - 
         - function choose_uint_type(max_val)
-       96     for N in (UInt8, UInt16, UInt32, UInt64, UInt128)
-    52839         if typemax(N) >= max_val
-    56071             return N
+        0     for N in (UInt8, UInt16, UInt32, UInt64, UInt128)
+        0         if typemax(N) >= max_val
+        0             return N
         -         end
         -     end
         0     throw(OverflowError())
@@ -17,15 +17,15 @@
         - 
         - function RecordedSpikes(instance, steps)
         -     # Choose a compact representation for the data we'll have to store:
-   526300     if issubtype(eltype(steps), Int)
+        0     if issubtype(eltype(steps), Int)
         0         TT = choose_uint_type(maximum(steps))
         -     else
         0         TT = eltype(steps)
         -     end
         0     TI = choose_uint_type(length(instance))
         - 
-       64     ts = Array(TT, 0)
-       80     id = Array(TI, 0)
+        0     ts = Array(TT, 0)
+        0     id = Array(TI, 0)
         0     RecordedSpikes{typeof(instance), typeof(steps), TT, TI}(
         -                    instance, steps, ts, id)
         - end
@@ -38,11 +38,11 @@
         - end
         - 
         - @generated function record!{T}(data::RecordedSpikes{T}, step)
- 16377494     subst = Dict()
-       64     decls = []
+ 15991824     subst = Dict()
+        0     decls = []
         0     unpack_soa!(decls, subst, T, :group, :i, "")
         0     spike_expr = replace(spike(T), subst)
-     3792     gen_func = quote
+        0     gen_func = quote
         0         $(Expr(:meta, :inline))
         0         $(Expr(:meta, :fastmath))
         0         if step in data.steps
@@ -52,8 +52,8 @@
         0             id = data.id
         0             for i in 1:length(group)
         0                 @inbounds if $spike_expr
-    28448                     push!(ts, step)
-     2320                     push!(id, i)
+    25632                     push!(ts, step)
+     2096                     push!(id, i)
         -                 end
         -             end
         -         end
