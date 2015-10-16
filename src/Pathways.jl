@@ -26,6 +26,7 @@ end
     on_spike_expr = replace(on_spike(post), subst)
 
     gen_func = gen_dense_pathway(decls, spike_expr, on_spike_expr)
+#    println(gen_func)
     return gen_func
 end
 
@@ -47,6 +48,7 @@ end
 
 function gen_dense_pathway(decls, test_expr, do_expr)
     quote
+        $(Expr(:meta, :fastmath))
         @assert length(pre) == size(path.W, 2)
         @assert length(post) == size(path.W, 1)
         $(decls...)

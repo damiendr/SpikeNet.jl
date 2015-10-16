@@ -14,17 +14,17 @@ using Parameters
 end
 Base.length(d::AdaptiveDendrites) = length(d.g)
 
-function AdaptiveDendrites(n::Int; kwargs...)
+function AdaptiveDendrites(n::Int; θ₀=1.0, kwargs...)
     g = zeros(Float32, n)
-    θ = ones(Float32, n)
+    θ = zeros(Float32, n) + θ₀
     I = zeros(Float32, n)
     AdaptiveDendrites(g=g, θ=θ, I=I; kwargs...)
 end
 
 update(::Type{AdaptiveDendrites}) = quote
+    I = (g > θ) * (I0 + Ig * g)
     qθ = qplusθ * (g > (θ + θhyst)) - qminθ * (g < θ)
     θ = clamp(θ + qθ, θmin, θmax)
-    I = (g > θ) * (I0 + Ig * g)
 end
 
 current(::Type{AdaptiveDendrites}) = :(I)
