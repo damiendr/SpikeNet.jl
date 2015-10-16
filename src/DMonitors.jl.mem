@@ -30,7 +30,7 @@
         - 
         - """
         - function RecordedData(instance, steps, fields...)
- 24810220     arrays = Dict()
+ 24783484     arrays = Dict()
         0     cols = length(steps)
         0     for sym in fields
         0         field = getfield(instance, sym)
@@ -75,13 +75,15 @@
         - Signals that there is new data to be recorded for timestep `step`.
         - """
         - @generated function record!{syms}(data::RecordedData{Val{syms}}, step)
- 66712612     record_statements = []
+ 66462743     record_statements = []
       128     for var in syms
       448         sym = quoted(var)
      4096         rec = :(data.arrays[$sym][:,data.idx] = data.instance.$var[:])
       192         push!(record_statements, rec)
         -     end
-     9856     quote
+    10880     quote
+        0         $(Expr(:meta, :inline))
+        0         $(Expr(:meta, :fastmath))
         0         if step == data.next
         0             data.idx += 1
   9353786             $(record_statements...)

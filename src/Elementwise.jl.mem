@@ -1,16 +1,16 @@
         - 
         - function replace(expr, subst; is_lhs=false)
-  5037879     try
-   430300         s = subst[expr]
+  5010199     try
+   409372         s = subst[expr]
         0         if isa(s, Tuple)
-    38255             lhs, rhs = s
+    34031             lhs, rhs = s
         -         else
         0             lhs = rhs = s
         -         end
         0         if is_lhs
         0             return lhs
         -         else
-     7216             return rhs
+     4704             return rhs
         -         end
         -     catch
         -         if isa(expr, Expr)
@@ -19,31 +19,31 @@
         0                 args = map(expr.args[2:end]) do arg
         0                     replace(arg, subst, is_lhs=false)
         -                 end
-     8096                 return Expr(expr.head, arg1, args...)
+     5280                 return Expr(expr.head, arg1, args...)
         -             end
         0             args = map(expr.args) do arg
         0                 replace(arg, subst, is_lhs=is_lhs)
         -             end
-    66797             return Expr(expr.head, args...)
+    57101             return Expr(expr.head, args...)
         -         else
-      160             return expr
+       80             return expr
         -         end
         -     end
         - end
         - 
         - function unpack_soa!(decls, subst, dtype::DataType, instance, index, suffix)
-  3468633     for (field, fieldtype) in zip(fieldnames(dtype), dtype.types)
+  3456793     for (field, fieldtype) in zip(fieldnames(dtype), dtype.types)
         - #        localname = gensym(field)
-   184944         x = Base.replace(string(instance), ".", "_")
-   103216         localname = Symbol("$(field)_$(x)")
+   128912         x = Base.replace(string(instance), ".", "_")
+    73104         localname = Symbol("$(field)_$(x)")
         0         if issubtype(fieldtype, AbstractArray)
-    21616             read_expr = write_expr = :($localname[$index])
+    13664             read_expr = write_expr = :($localname[$index])
         -         else
         0             read_expr = localname
-    21504             write_expr = :($instance.$field)
+    14336             write_expr = :($instance.$field)
         -         end
-   103568         push!(decls, :($localname = $instance.$field))
-   832577         subst[Symbol("$(field)$(suffix)")] = (write_expr, read_expr)
+    66608         push!(decls, :($localname = $instance.$field))
+   790225         subst[Symbol("$(field)$(suffix)")] = (write_expr, read_expr)
         -     end
         - end
         - 

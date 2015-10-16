@@ -1,8 +1,8 @@
         - 
         - 
         - @generated function input_start!(group)
-  3801065     subst = Dict()
-      128     decls = []
+  2025991     subst = Dict()
+       64     decls = []
         0     unpack_soa!(decls, subst, group, :group, :i, "")
         0     update_expr = replace(input_start(group), subst)
         0     gen_func = gen_elemwise(decls, update_expr, :group)
@@ -10,8 +10,8 @@
         - end
         - 
         - @generated function update!(group, dt, step)
-  8165417     subst = Dict()
-      384     decls = []
+  6968929     subst = Dict()
+      192     decls = []
         0     unpack_soa!(decls, subst, group, :group, :i, "")
         0     update_expr = replace(update(group), subst)
         0     gen_func = gen_elemwise(decls, update_expr, :group)
@@ -20,8 +20,8 @@
         - end
         - 
         - @generated function reset!(group, dt)
-  1528838     subst = Dict()
-      128     decls = []
+   812321     subst = Dict()
+       64     decls = []
         0     unpack_soa!(decls, subst, group, :group, :i, "")
         0     update_expr = replace(reset(group), subst)
         0     gen_func = gen_elemwise(decls, update_expr, :group)
@@ -29,31 +29,32 @@
         - end
         - 
         - @generated function add_current!{sink_var}(sink, ::Type{Val{sink_var}}, source)
-  2252280     subst_source = Dict()
-     2432     subst_sink = Dict()
-      256     decls = []
+  1392112     subst_source = Dict()
+     1216     subst_sink = Dict()
+      128     decls = []
         - 
         0     unpack_soa!(decls, subst_source, source, :source, :i, "")
         0     unpack_soa!(decls, subst_source, sink, :sink, :i, "_post")
         - 
         0     unpack_soa!(decls, subst_sink, sink, :sink, :i, "")
-        0 
+        - 
         0     current_expr = replace(current(source), subst_source)
         0     sink_expr = replace(sink_var, subst_sink)
-      448     update_expr = :($sink_expr += $current_expr)
+      224     update_expr = :($sink_expr += $current_expr)
         0     gen_func = gen_elemwise(decls, update_expr, :sink)
-        0 #    println(gen_func)
+        - #    println(gen_func)
         0     return gen_func
-        0 end
-        0 
-        0 function gen_elemwise(decls, do_expr, group)
-   436564     quote
-        0         $(Expr(:meta, :fastmath))
-        0         $(decls...)
-        0         @simd for i in 1:length($group)
-        0             @inbounds $do_expr
-     2416         end
-     2672     end
-        0 end
-        0 
+        - end
+        - 
+        - function gen_elemwise(decls, do_expr, group)
+   460521     quote
+        -         $(Expr(:meta, :inline))
+        -         $(Expr(:meta, :fastmath))
+        -         $(decls...)
+        -         @simd for i in 1:length($group)
+        -             @inbounds $do_expr
+        -         end
+        -     end
+        - end
+        - 
         - 

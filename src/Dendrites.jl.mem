@@ -21,7 +21,7 @@
     36334     AdaptiveDendrites(g=g, θ=θ, I=I; kwargs...)
         - end
         - 
-    16619 update(::Type{AdaptiveDendrites}) = quote
+    14603 update(::Type{AdaptiveDendrites}) = quote
         -     I = (g > θ) * (I0 + Ig * g)
         -     qθ = qplusθ * (g > (θ + θhyst)) - qminθ * (g < θ)
         -     θ = clamp(θ + qθ, θmin, θmax)

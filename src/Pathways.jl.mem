@@ -15,7 +15,7 @@
         - end
         - 
         - @generated function route_spikes!(pre, path::DensePathway, post)
-   745464     decls = []
+   737126     decls = []
       608     subst_pre = Dict()
         0     unpack_soa!(decls, subst_pre, pre, :pre, :i, "")
         0     spike_expr = replace(spike(pre), subst_pre)
@@ -31,7 +31,7 @@
         - end
         - 
         - @generated function learn!{P}(pre, path::DensePathway{P}, post, post2)
-  3120316     subst = Dict()
+  3126276     subst = Dict()
       128     decls = []
         0     unpack_soa!(decls, subst, pre, :pre, :i, "_pre")
         0     unpack_soa!(decls, subst, post, :post, :j, "_post")
@@ -47,7 +47,8 @@
         0 end
         0 
         0 function gen_dense_pathway(decls, test_expr, do_expr)
-   736301     quote
+   809003     quote
+        0         $(Expr(:meta, :inline))
         0         $(Expr(:meta, :fastmath))
         0         @assert length(pre) == size(path.W, 2)
         0         @assert length(post) == size(path.W, 1)
@@ -61,6 +62,6 @@
         -             end
         -         end
         -     end
-        - end
+        0 end
         0 
         0 

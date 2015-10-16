@@ -12,12 +12,12 @@
    281238     ExponentialInhSynapses(g=zeros(Float32, n); kwargs...)
         - end
         - 
-    11468 update(::Type{ExponentialInhSynapses}) = quote
+    10620 update(::Type{ExponentialInhSynapses}) = quote
         -     dg = -g/τ
         -     g = g + dg * dt
         - end
         - 
-     8306 current(::Type{ExponentialInhSynapses}) = :(Ig * g * u_post)
+     8178 current(::Type{ExponentialInhSynapses}) = :(Ig * g * u_post)
         - 
      8773 on_spike(::Type{ExponentialInhSynapses}) = quote
         -     g += w

@@ -21,7 +21,7 @@
         - end
         - 
         - function LIFSomas(n::Int; μτ=10e-3, μθ=0.8, μρ=0.65, jitter=0.05, kwargs...)
- 14918314     Id = zeros(Float32, n)
+ 14924378     Id = zeros(Float32, n)
       896     Is = zeros(Float32, n)
       896     Itot = zeros(Float32, n)
       896     u = zeros(Float32, n)
@@ -35,23 +35,23 @@
       608     LIFSomas(Id=Id, Is=Is, Itot=Itot, u=u, z=z, r=r, τ=τ, θ=θ, ρ=ρ; kwargs...)
         - end
         - 
-    10280 input_start(::Type{LIFSomas}) = quote
+     9800 input_start(::Type{LIFSomas}) = quote
         -     Id = 0.0
         -     Itot = 0.0
         -     z = 0.0
         - end
         - 
-    15442 update(::Type{LIFSomas}) = quote
+    13372 update(::Type{LIFSomas}) = quote
         -     Ileak = -u * g_leak
         -     I = Id + Is + Ileak
         -     Itot += I
-        -     du = Float32(I) * dt/τ
+        -     du = I * dt/τ
         -     u = clamp(u + du, 0.0, 1.0)
         - end
         - 
-     3360 spike(::Type{LIFSomas}) = :((u >= θ) && (r <= zero(r)))
+     3024 spike(::Type{LIFSomas}) = :((u >= θ) && (r <= 0))
         - 
-    52124 reset(::Type{LIFSomas}) = quote
+    48044 reset(::Type{LIFSomas}) = quote
         -     z = ifelse($(spike(LIFSomas)), z+1, z)
         -     r = ifelse($(spike(LIFSomas)), refrac, max(r-1, 0))
         -     u = ifelse($(spike(LIFSomas)), ρ, u)
