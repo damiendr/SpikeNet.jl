@@ -36,9 +36,9 @@ function LIFSomas(n::Int; μτ=10e-3, μθ=0.8, μρ=0.65, jitter=0.05, kwargs..
 end
 
 input_start(::Type{LIFSomas}) = quote
-    Id = 0.0
-    Itot = 0.0
-    z = 0.0
+    Id = zero(Id)
+    Itot = zero(Itot)
+    z = zero(z)
 end
 
 update(::Type{LIFSomas}) = quote
@@ -46,14 +46,14 @@ update(::Type{LIFSomas}) = quote
     I = Id + Is + Ileak
     Itot += I
     du = I * dt/τ
-    u = clamp(u + du, 0.0, 1.0)
+    u = clamp(u + du, zero(u), one(u))
 end
 
-spike(::Type{LIFSomas}) = :((u >= θ) && (r <= 0))
+spike(::Type{LIFSomas}) = :((u >= θ) && (r <= zero(r)))
 
 reset(::Type{LIFSomas}) = quote
-    z = ifelse($(spike(LIFSomas)), z+1, z)
-    r = ifelse($(spike(LIFSomas)), refrac, max(r-1, 0))
+    z = ifelse($(spike(LIFSomas)), z+one(z), z)
+    r = ifelse($(spike(LIFSomas)), refrac, max(r-one(r), zero(r)))
     u = ifelse($(spike(LIFSomas)), ρ, u)
     Is = zero(Is)
 end
