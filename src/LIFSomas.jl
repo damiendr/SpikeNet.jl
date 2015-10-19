@@ -24,11 +24,12 @@ function LIFSomas(n::Int; τ=10e-3, θ=0.8, kρ=0.8, jitter=0.1, kwargs...)
     r = zeros(Int16, n)
 
     # Add some jitter around these parameters for population diversity:
-    τ = gauss(Float32, n, τ, τ * jitter)
-    θ = gauss(Float32, n, θ, θ * jitter)
-    ρ = θ .* gauss(Float32, n, kρ, kρ * jitter)
+    τ_ = gauss(Float32, n, τ, τ * jitter)
+    θ_ = gauss(Float32, n, θ, θ * jitter)
+    ρ_ = θ_ .* gauss(Float32, n, kρ, kρ * jitter)
 
-    LIFSomas(Id=Id, Is=Is, Itot=Itot, u=u, z=z, r=r, τ=τ, θ=θ, ρ=ρ; kwargs...)
+    LIFSomas(Id=Id, Is=Is, Itot=Itot, u=u, z=z, r=r, τ=τ_, θ=θ_, ρ=ρ_;
+        kwargs...)
 end
 
 input_start(::Type{LIFSomas}) = quote
