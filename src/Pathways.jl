@@ -50,8 +50,8 @@ function gen_dense_pathway(decls, test_expr, do_expr)
     quote
         $(Expr(:meta, :inline))
         $(Expr(:meta, :fastmath))
-        @assert length(pre) == size(path.W, 2)
-        @assert length(post) == size(path.W, 1)
+#        @assert length(pre) == size(path.W, 2)
+#        @assert length(post) == size(path.W, 1)
         $(decls...)
         w = path.W
         for i in 1:length(pre)

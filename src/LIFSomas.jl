@@ -15,12 +15,7 @@ using Parameters
 end
 Base.length(somas::LIFSomas) = length(somas.u)
 
-function gauss(T, n, μ, σ)
-    arr = zeros(Float32, n)
-    arr += randn(n) * σ + μ
-end
-
-function LIFSomas(n::Int; μτ=10e-3, μθ=0.8, μρ=0.65, jitter=0.05, kwargs...)
+function LIFSomas(n::Int; τ=10e-3, θ=0.8, ρ=0.65, jitter=0.05, kwargs...)
     Id = zeros(Float32, n)
     Is = zeros(Float32, n)
     Itot = zeros(Float32, n)
@@ -28,9 +23,10 @@ function LIFSomas(n::Int; μτ=10e-3, μθ=0.8, μρ=0.65, jitter=0.05, kwargs..
     z = zeros(Int16, n)
     r = zeros(Int16, n)
 
-    τ = gauss(Float32, n, μτ, jitter)
-    θ = gauss(Float32, n, μθ, jitter)
-    ρ = gauss(Float32, n, μρ, jitter)
+    # Add some jitter around these parameters for population diversity:
+    τ = gauss(Float32, n, τ, jitter)
+    θ = gauss(Float32, n, θ, jitter)
+    ρ = gauss(Float32, n, ρ, jitter)
 
     LIFSomas(Id=Id, Is=Is, Itot=Itot, u=u, z=z, r=r, τ=τ, θ=θ, ρ=ρ; kwargs...)
 end

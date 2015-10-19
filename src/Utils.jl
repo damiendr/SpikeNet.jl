@@ -46,3 +46,11 @@ macro stats(expr)
         end
     end)
 end
+
+function gauss(T, n, μ, σ; cutoff=2)
+    arr = zeros(Float32, n)
+    arr += randn(n) * σ + μ
+    clamp!(arr, μ-σ*cutoff, μ+σ*cutoff)
+    return arr
+end
+
