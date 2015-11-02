@@ -23,9 +23,9 @@ end
     unpack!(decls, path, :path, :j, :i)
     alias!(decls, :w, :(path.W), :(w[j,i]))
     e = 1f-3
-    test_expr = map_fields(:(z_pre > e), decls, :pre => "pre")
+    test_expr = map_fields(:(z_pre > e), decls, :pre => "_pre")
     do_expr = map_fields(:(g_post += k * w), decls,
-                            :w => "", :post => "post", :path => "")
+                            :w => "", :post => "_post", :path => "")
 
     gen_func = gen_dense_pathway(decls, test_expr, do_expr)
     println(gen_func)
