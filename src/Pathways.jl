@@ -4,7 +4,6 @@ using Parameters
 
 @with_kw type DensePathway{P} <: Pathway
     W::Matrix{Float32}
-    k::Float32 = 1.0f0
     learn::P
 end
 
@@ -13,8 +12,8 @@ type SparsePathway{P} <: Pathway
     learn::P
 end
 
-@inline function route_rates!(pre, path::DensePathway, post)
-    Base.LinAlg.BLAS.gemv!('N', path.k, path.W, pre.z, 1.0f0, post.g)
+@inline function route_rates!(pre, path::DensePathway, post, k)
+    Base.LinAlg.BLAS.gemv!('N', k, path.W, pre.z, 1.0f0, post.g)
 end
 
 @generated function route_spikes!(pre, path::DensePathway, post)

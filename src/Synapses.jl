@@ -20,8 +20,13 @@ end
 current(::Type{ExponentialInhSynapses}) = :(Ig * g * u_post)
 
 on_spike(::Type{ExponentialInhSynapses}) = quote
-    g += k*w
+    g += w
 end
+
+function on_spike(synapses::ExponentialInhSynapses, post_id::Int, w)
+    synapses.g[post_id] += w
+end
+
 
 @with_kw type ThetaSynapses
     g_max::Float32 = -1.0
