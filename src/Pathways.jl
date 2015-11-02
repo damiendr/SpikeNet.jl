@@ -16,6 +16,22 @@ end
     Base.LinAlg.BLAS.gemv!('N', k, path.W, pre.z, 1.0f0, post.g)
 end
 
+function route_sparse_rates!(pre, path::DensePathway, post, k)
+    decls = Dict()
+    unpack!(decls, pre, :pre, :i)
+    unpack!(decls, post, :post, :j)
+    unpack!(decls, path, :path, :j, :i)
+    alias!(decls, :w, :(path.W), :(w[j,i]))
+    e = 1f-3
+    test_expr = map_fields(:(z_pre > e), decls, :pre => "pre")
+    do_expr = map_fields(:(g_post += k * w)), decls,
+                            :w => "", :post => "post", :path => "")
+
+    gen_func = gen_dense_pathway(decls, test_expr, do_expr)
+    println(gen_func)
+    return gen_func
+end
+
 @generated function route_spikes!(pre, path::DensePathway, post)
     decls = Dict()
     unpack!(decls, pre, :pre, :i)
