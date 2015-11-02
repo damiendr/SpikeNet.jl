@@ -24,7 +24,7 @@ function route_sparse_rates!(pre, path::DensePathway, post, k)
     alias!(decls, :w, :(path.W), :(w[j,i]))
     e = 1f-3
     test_expr = map_fields(:(z_pre > e), decls, :pre => "pre")
-    do_expr = map_fields(:(g_post += k * w)), decls,
+    do_expr = map_fields(:(g_post += k * w), decls,
                             :w => "", :post => "post", :path => "")
 
     gen_func = gen_dense_pathway(decls, test_expr, do_expr)
