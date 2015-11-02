@@ -81,7 +81,7 @@ Signals that there is new data to be recorded for timestep `step`.
         rec = :(data.arrays[$sym][:,data.idx] = data.instance.$var[:])
         push!(record_statements, rec)
     end
-    quote
+    func = quote
         $(Expr(:meta, :inline))
         $(Expr(:meta, :fastmath))
         if step == data.next && !done(data.steps, step)
@@ -91,5 +91,7 @@ Signals that there is new data to be recorded for timestep `step`.
             data.next = next_idx
         end
     end
+    println(func)
+    func
 end
 

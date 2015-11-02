@@ -38,16 +38,15 @@ function reset!(r::RecordedSpikes)
 end
 
 @generated function record!{T}(data::RecordedSpikes{T}, step)
-    subst = Dict()
-    decls = []
-    unpack_soa!(decls, subst, T, :group, :i, "")
-    spike_expr = replace(spike(T), subst)
+    decls = Dict()
+    unpack!(decls, T, :group, :i)
+    spike_expr = map_fields(spike(T), decls, :group => "")
     gen_func = quote
         $(Expr(:meta, :inline))
         $(Expr(:meta, :fastmath))
         if step in data.steps
             group = data.instance
-            $(decls...)
+            $(declare(decls)...)
             ts = data.ts
             id = data.id
             for i in 1:length(group)
@@ -58,6 +57,7 @@ end
             end
         end
     end
+    println(gen_func)
     return gen_func
 end
 

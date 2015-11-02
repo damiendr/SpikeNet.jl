@@ -1,17 +1,28 @@
 
+ExprOrSymbol = Union{Expr,Symbol}
+
+type Field
+    name::ExprOrSymbol
+    declare::ExprOrSymbol
+    read::ExprOrSymbol
+    write::ExprOrSymbol
+    used::Bool
+end
+
+Field(name, declare, read, write) = Field(name, declare, read, write, false)
+
 function replace(expr, subst; is_lhs=false)
     try
         s = subst[expr]
-        if isa(s, Tuple)
-            lhs, rhs = s
-        else
-            lhs = rhs = s
+        if isa(s, Field)
+            s.used = true
+            if is_lhs
+                return s.write
+            else
+                return s.read
+            end
         end
-        if is_lhs
-            return lhs
-        else
-            return rhs
-        end
+        return s
     catch
         if isa(expr, Expr)
             if expr.head == :(=)
@@ -29,6 +40,50 @@ function replace(expr, subst; is_lhs=false)
             return expr
         end
     end
+end
+
+function unpack!(decls::Dict, dtype::DataType, obj, indices...)
+    fields = []
+    for (field, fieldtype) in zip(fieldnames(dtype), dtype.types)
+        obj_name = Base.replace(string(obj), ".", "_")
+        unpacked = Symbol("$(field)_$(obj_name)")
+        declare = :($unpacked = $obj.$field)
+        if issubtype(fieldtype, AbstractArray) && length(indices) > 0
+            read_expr = write_expr = :($unpacked[$(indices...)])
+        else
+            read_expr = unpacked
+            write_expr = :($obj.$field)
+        end
+        push!(fields, Field(field, declare, read_expr, write_expr))
+    end
+    decls[obj] = fields
+end
+
+function alias!(decls, unpacked, value_expr, read_expr, write_expr=read_expr)
+    decls[unpacked] = [Field(unpacked, :($unpacked = $value_expr), read_expr, write_expr)]
+end
+
+function map_fields(expr::ExprOrSymbol, decls::Dict, mappings...)
+    subst = Dict()
+    for (obj, suffix) in mappings
+        for field::Field in decls[obj]
+            matched = Symbol("$(field.name)$(suffix)")
+            subst[matched] = field
+        end
+    end
+    return replace(expr, subst)
+end
+
+function declare(decls::Dict)
+    statements = []
+    for fields in values(decls)
+        for f in fields
+            if f.used
+                push!(statements, f.declare)
+            end
+        end
+    end
+    statements
 end
 
 function unpack_soa!(decls, subst, dtype::DataType, instance, index, suffix)

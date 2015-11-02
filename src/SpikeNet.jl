@@ -9,8 +9,11 @@ export AdaptiveDendrites
 include("LIFSomas.jl")
 export LIFSomas
 
+include("ReLU.jl")
+export RectLinUnits
+
 include("Hebbian.jl")
-export PreGatedHebb, OmegaThresholdHebb, PreGatedMultQHebb, OmegaThresholdEIHebb
+export QPreSubTernary, QPostSubHebb, PreGatedMultQHebb
 
 include("Pathways.jl")
 export DensePathway, route_rates!, route_spikes!, learn!
@@ -21,7 +24,7 @@ include("Groups.jl")
 export update!, reset!, input_start!, add_current!
 
 include("Input.jl")
-export RateInput
+export InputUnits, DatasetInput, set_rates!
 
 include("DMonitors.jl")
 export record!, reset!, timestamps, RecordedData

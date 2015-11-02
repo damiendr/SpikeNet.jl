@@ -49,7 +49,9 @@ end
 spike(::Type{LIFSomas}) = :((u >= θ) && (r <= zero(r)))
 
 reset(::Type{LIFSomas}) = quote
-    sp = $(spike(LIFSomas))
+    sp = $(spike(LIFSomas)) # put this in a variable so the compiler knows
+                            # at which point we mean to evaluate that expr
+                            # (*before* the spike reset below)
     z = ifelse(sp, z+one(z), z)
     r = ifelse(sp, refrac, max(r-one(r), zero(r)))
     u = ifelse(sp, ρ, u)

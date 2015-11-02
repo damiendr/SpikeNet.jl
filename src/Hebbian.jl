@@ -2,15 +2,85 @@
 using Parameters
 
 
-@with_kw type PreGatedHebb{Float}
+@with_kw type PreQHebb{Float}
+    θ::Float = 0.5
+end
+
+learn{Float}(::Type{PreQHebb{Float}}) = quote
+    x = $Float(z_pre)
+    z = $Float(z_post)
+    dwplus = qplus * z * (x >= θ)
+    dwmin = qmin * z * (x < θ)
+    w = clamp(w + dwplus - dwmin * w, zero(w), one(w))
+end
+
+# =======================================================
+# Rules for ff exc/inh
+# =======================================================
+
+@with_kw type QPreSubTernary{Float}
+    θy::Float = 1.0
+    θz::Float = 3.0
+    qplus::Float = 1e-3
+    qmin::Float = 1e-3
+end
+
+learn{Float}(::Type{QPreSubTernary{Float}}) = quote
+    x = $Float(z_pre)
+    y = $Float(I_post)
+    z = $Float(z_post)
+    dwplus = qplus * x * (y >= θy) * (z < θz)
+    dwmin = qmin * x * (y >= θy) * (z >= θz)
+    w = clamp(w + dwplus - dwmin, zero(w), one(w))
+end
+
+@with_kw type QPostSubHebb{Float}
+    θx::Float = 0.5
+    qplus::Float = 1e-3
+    qmin::Float = 1e-3
+end
+
+learn{Float}(::Type{QPostSubHebb{Float}}) = quote
+    x = $Float(z_pre)
+    z = $Float(z_post)
+    dwplus = qplus * z * (x >= θx)
+    dwmin = qmin * z * (x < θx)
+    w = clamp(w + dwplus - dwmin, zero(w), one(w))
+end
+
+
+# =======================================================
+# Presynaptically-gated Hebb rule with subtractive decay
+# =======================================================
+
+@with_kw type PreGatedSubHebb{Float}
     θ::Float = 0.5
     μ::Float = 1e-3
 end
 
-learn{Float}(::Type{PreGatedHebb{Float}}) = quote
-    dw = z_pre * (z_post - θ)
+learn{Float}(::Type{PreGatedSubHebb{Float}}) = quote
+    x = $Float(z_pre)
+    y = $Float(z_post)
+    dw = x * (y - θ)
     w = clamp(w + μ * dw, zero(w), one(w))
 end
+
+# =========================================================
+# Presynaptically-gated Hebb rule with multiplicative decay
+# =========================================================
+
+@with_kw type PreGatedMulHebb{Float}
+    μ::Float = 1e-3
+end
+
+learn{Float}(::Type{PreGatedMulHebb{Float}}) = quote
+    x = $Float(z_pre)
+    y = $Float(z_post)
+    dw = x * (y - w)
+    w = clamp(w + μ * dw, zero(w), one(w))
+end
+
+# =========================================================
 
 @with_kw type PreGatedMultQHebb{Float}
     θ::Float = 0.5
@@ -28,6 +98,8 @@ learn{Float}(::Type{PreGatedMultQHebb{Float}}) = quote
     dw = dw_plus * (w_max - w) - dw_min * (w - w_min)
     w = clamp(w + dw, w_min, w_max)
 end
+
+# =========================================================
 
 @with_kw type OmegaThresholdHebb{Float}
     θx::Float = 0.5
@@ -50,6 +122,7 @@ learn{Float}(::Type{OmegaThresholdHebb{Float}}) = quote
     w = clamp(w + dw, zero(w), one(w))
 end
 
+# =========================================================
 
 @with_kw type OmegaThresholdEIHebb{Float}
     θx::Float = 0.5

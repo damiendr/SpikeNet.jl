@@ -54,3 +54,14 @@ function gauss(T, n, μ, σ; cutoff=2)
     return arr
 end
 
+function rand_exp!(arr::Array, scale)
+    @inbounds for i=1:length(arr)
+        arr[i] = randexp() * scale
+    end
+end
+
+function rand_gauss!(arr::Array, μ, σ)
+    @inbounds for i=1:length(arr)
+        arr[i] = randn() * σ + μ
+    end
+end

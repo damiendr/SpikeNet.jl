@@ -21,6 +21,10 @@ function AdaptiveDendrites(n::Int; θ₀=1.0, kwargs...)
     AdaptiveDendrites(g=g, θ=θ, I=I; kwargs...)
 end
 
+input_start(::Type{AdaptiveDendrites}) = quote
+    g = zero(g)
+end
+
 update(::Type{AdaptiveDendrites}) = quote
     I = (g > θ) * (I0 + Ig * g)
     qθ = qplusθ * (g > (θ + θhyst)) - qminθ * (g < θ)
