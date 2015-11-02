@@ -16,7 +16,7 @@ end
     Base.LinAlg.BLAS.gemv!('N', k, path.W, pre.z, 1.0f0, post.g)
 end
 
-function route_sparse_rates!(pre, path::DensePathway, post, k)
+@generated function route_sparse_rates!(pre, path::DensePathway, post, k)
     decls = Dict()
     unpack!(decls, pre, :pre, :i)
     unpack!(decls, post, :post, :j)
