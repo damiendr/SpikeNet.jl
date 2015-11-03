@@ -26,6 +26,14 @@ function RecordedSpikes(instance, steps)
 
     ts = Array(TT, 0)
     id = Array(TI, 0)
+
+    # Let's pre-allocate a sensible chunk of memory, assuming a 1 per thousand
+    # spiking probability per timestep:
+    expected_spikes = clamp((length(steps) * length(instance)) ÷ 1000,
+                            1000, 10000000) 
+    sizehint!(ts, expected_spikes)
+    sizehint!(id, expected_spikes)
+
     RecordedSpikes{typeof(instance), typeof(steps), TT, TI}(
                    instance, steps, ts, id)
 end
