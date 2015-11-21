@@ -91,7 +91,7 @@ Signals that there is new data to be recorded for timestep `step`.
             data.next = next_idx
         end
     end
-    println(func)
+    # println(func)
     func
 end
 

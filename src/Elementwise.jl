@@ -101,3 +101,16 @@ function unpack_soa!(decls, subst, dtype::DataType, instance, index, suffix)
         subst[Symbol("$(field)$(suffix)")] = (write_expr, read_expr)
     end
 end
+
+
+function get_elemwise_code(func, args)
+    methods = Base.methods(func, map(typeof, args))
+    method = methods[1]
+    arguments = Base.arg_decl_parts(method)[2]
+    expr = func(args...)
+    argnames, argtypes = zip(arguments...)
+    return argnames, expr
+end
+
+
+
