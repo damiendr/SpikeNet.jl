@@ -25,9 +25,7 @@ end
     alias!(decls, :w, :(path.W), :(w[j,i]))
     test_expr = map_fields(:(z_pre > 1f-3), decls, :pre => "_pre")
     do_expr = map_fields(quote
-        if (w > th)
-            g_post += k * z_pre
-        end
+        g_post += k * z_pre * (w > th)
     end, decls, :w => "", :post => "_post", :pre => "_pre")
 
     gen_func = gen_dense_pathway(decls, test_expr, do_expr)
@@ -42,8 +40,9 @@ end
     unpack!(decls, path, :path, :j, :i)
     alias!(decls, :w, :(path.W), :(w[j,i]))
     test_expr = map_fields(:(z_pre > 1f-3), decls, :pre => "_pre")
-    do_expr = map_fields(:(g_post += k * z_pre * w), decls,
-                            :w => "", :post => "_post", :pre => "_pre")
+    do_expr = map_fields(quote
+        g_post += k * z_pre * w
+    end, decls, :w => "", :post => "_post", :pre => "_pre")
 
     gen_func = gen_dense_pathway(decls, test_expr, do_expr)
     # println(gen_func)
@@ -59,11 +58,8 @@ end
     alias!(decls, :w, :(path.W), :(w[j,i]))
 
     spike_expr = map_fields(spike(pre), decls, :pre => "")
-    on_spike_expr = map_fields(quote
-        if (w > th)
-            $(on_spike(post))
-        end
-    end, decls, :w => "", :post => "", :path => "")
+    on_spike_expr = map_fields(on_spike_th(post),
+                        decls, :w => "", :post => "", :path => "")
     gen_func = gen_dense_pathway(decls, spike_expr, on_spike_expr)
     # println(gen_func)
     return gen_func

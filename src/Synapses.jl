@@ -23,6 +23,10 @@ on_spike(::Type{ExponentialInhSynapses}) = quote
     g += w
 end
 
+on_spike_th(::Type{ExponentialInhSynapses}) = quote
+    g += (w > th)
+end
+
 function on_spike(synapses::ExponentialInhSynapses, post_id::Int, w)
     synapses.g[post_id] += w
 end
