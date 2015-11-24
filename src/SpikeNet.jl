@@ -21,7 +21,7 @@ export DensePathway, route_rates!, route_sparse_rates!, route_spikes!, learn!
 include("Elementwise.jl")
 
 include("Groups.jl")
-export update!, reset!, input_start!, add_current!
+export update!, reset!, input_start!, add_current!, learn_post!
 
 include("Input.jl")
 export InputUnits, DatasetInput, set_rates!

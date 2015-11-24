@@ -25,6 +25,16 @@ end
     return gen_func
 end
 
+@ispc @generated function learn_post!(dendrites, somas)
+    decls = Dict()
+    unpack!(decls, dendrites, :dendrites, :i)
+    unpack!(decls, somas, :somas, :i)
+    expr = map_fields(learn_post(dendrites), decls,
+                        :dendrites => "", :somas => "_post")
+    gen_func = gen_elemwise(decls, expr, :dendrites)
+    return gen_func
+end
+
 @ispc @generated function add_current!{sink_var}(sink, ::Type{Val{sink_var}}, source)
     decls = Dict()
 

@@ -19,8 +19,6 @@ end
 # =======================================================
 
 @with_kw type QPreSubTernary{Float}
-    θy::Float = 1.0
-    θz::Float = 3.0
     qplus::Float = 1e-3
     qmin::Float = 1e-3
 end
@@ -28,23 +26,10 @@ end
 learn{Float}(::Type{QPreSubTernary{Float}}) = quote
     x = $Float(z_pre)
     y = $Float(I_post)
-    z = $Float(z_post)
-    dwplus = qplus * x * (y >= θy) * (z < θz)
-    dwmin = qmin * x * (y >= θy) * (z >= θz)
-    w = clamp(w + dwplus - dwmin, zero(w), one(w))
+    dwplus = qplus * x * y * (z_post < θz_post)
+    dwmin = qmin * x * y * (z_post >= θz_post)
+    w = clamp(w + η_post * (dwplus - dwmin), zero(w), one(w))
 end
-
-
-# learn{Float}(::Type{QPreSubTernary{Float}}, pre, dendrite, post) = quote
-#     x = $Float(pre.z)
-#     y = $Float(dendrite.I)
-#     z = $Float(post.z)
-    
-#     dwplus = qplus * x * (y >= θy) * (z < θz)
-#     dwmin = qmin * x * (y >= θy) * (z >= θz)
-#     w = clamp(w + dwplus - dwmin, zero(w), one(w))
-#     r = uniform(rngstate)
-# end
 
 
 @with_kw type QPostSubHebb{Float}
@@ -58,7 +43,7 @@ learn{Float}(::Type{QPostSubHebb{Float}}) = quote
     z = $Float(z_post)
     dwplus = qplus * z * (x >= θx)
     dwmin = qmin * z * (x < θx)
-    w = clamp(w + dwplus - dwmin, zero(w), one(w))
+    w = clamp(w + η_post * (dwplus - dwmin), zero(w), one(w))
 end
 
 
