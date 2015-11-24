@@ -16,7 +16,7 @@ include("Hebbian.jl")
 export QPreSubTernary, QPostSubHebb, PreGatedMultQHebb
 
 include("Pathways.jl")
-export DensePathway, route_rates!, route_sparse_rates!, route_spikes!, learn!
+export DensePathway, route_rates!, route_sparse_rates!, route_sparse_rates_th!, route_spikes!, learn!
 
 include("Elementwise.jl")
 
