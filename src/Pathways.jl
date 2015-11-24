@@ -25,7 +25,7 @@ end
     alias!(decls, :w, :(path.W), :(w[j,i]))
     test_expr = map_fields(:(z_pre > 1f-3), decls, :pre => "_pre")
     do_expr = map_fields(quote
-        g_post += k * z_pre * (w > th)
+        g_post += k * z_pre * Float32(w > th)
     end, decls, :w => "", :post => "_post", :pre => "_pre")
 
     gen_func = gen_dense_pathway(decls, test_expr, do_expr)

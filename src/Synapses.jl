@@ -24,7 +24,7 @@ on_spike(::Type{ExponentialInhSynapses}) = quote
 end
 
 on_spike_th(::Type{ExponentialInhSynapses}) = quote
-    g += (w > th)
+    g += Float32(w > th)
 end
 
 function on_spike(synapses::ExponentialInhSynapses, post_id::Int, w)
