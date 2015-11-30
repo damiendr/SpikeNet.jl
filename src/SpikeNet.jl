@@ -13,7 +13,7 @@ include("ReLU.jl")
 export RectLinUnits
 
 include("Hebbian.jl")
-export QPreSubTernary, QPostSubHebb, PreGatedMultQHebb
+export QPreSubTernary, QPostSubHebb, PreGatedMultQHebb, QPostSubTernaryHebb
 
 include("Pathways.jl")
 export DensePathway, route_rates!, route_sparse_rates!, route_sparse_rates!, route_spikes!, learn!
