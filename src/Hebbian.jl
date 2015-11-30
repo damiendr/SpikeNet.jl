@@ -18,8 +18,8 @@ end
 # Rules for ff exc/inh
 # =======================================================
 
-@fastmath @inline function iftrue(x::Bool, a)
-    x * a
+@fastmath @inline function F(x::Bool)
+    Float32(x)
 end
 
 @with_kw type QPreSubTernary{Float}
@@ -30,8 +30,8 @@ end
 learn{Float}(::Type{QPreSubTernary{Float}}) = quote
     x = $Float(z_pre)
     y = $Float(I_post)
-    dwplus = iftrue((z_post < θz_post), qplus * x * y)
-    dwmin = iftrue((z_post >= θz_post), qmin * x * y)
+    dwplus = qplus * x * y * F(z_post < θz_post)
+    dwmin = qmin * x * y * F(z_post >= θz_post)
     w = clamp(w + η_post * (dwplus - dwmin), zero(w), one(w))
 end
 
@@ -45,8 +45,8 @@ end
 learn{Float}(::Type{QPostSubHebb{Float}}) = quote
     x = $Float(z_pre)
     z = $Float(z_post)
-    dwplus = iftrue((x >= θx), qplus * z)
-    dwmin = iftrue((x < θx), qmin * z)
+    dwplus = qplus * z * F(x >= θx)
+    dwmin = qmin * z * F(x < θx)
     w = clamp(w + η_post * (dwplus - dwmin), zero(w), one(w))
 end
 
@@ -62,12 +62,9 @@ learn{Float}(::Type{QPostSubTernaryHebb{Float}}) = quote
     x = $Float(z_pre)
     y = $Float(I_post)
 
-    dw_ltp = iftrue((x >= θx) && (z_post >= θz_post),
-                    qltp)
-    dw_ltd = iftrue((x < θx) && (z_post >= θz_post),
-                    qltd)
-    dw_dec = iftrue((x >= θx) && (y > zero($Float)) && (z_post < θz_post),
-                    qdec)
+    dw_ltp = qltp * F(x >= θx) * F(z_post >= θz_post)
+    dw_ltd = qltd * F(x < θx) * F(z_post >= θz_post)
+    dw_dec = qdec * F(x >= θx) * y * F(z_post < θz_post)
     w = clamp(w + η_post * (dw_ltp - dw_ltd - dw_dec), zero(w), one(w))
 end
 
@@ -116,8 +113,8 @@ end
 learn{Float}(::Type{PreGatedMultQHebb{Float}}) = quote
     x = $Float(z_pre)
     y = $Float(z_post)
-    dw_plus = iftrue((y >= θ), q_plus * x)
-    dw_min = iftrue((y < θ), q_min * x)
+    dw_plus = q_plus * x * F(y >= θ)
+    dw_min = q_min * x * F(y < θ)
     dw = dw_plus * (w_max - w) - dw_min * (w - w_min)
     w = clamp(w + dw, w_min, w_max)
 end
