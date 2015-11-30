@@ -47,6 +47,24 @@ learn{Float}(::Type{QPostSubHebb{Float}}) = quote
 end
 
 
+@with_kw type QPostSubTernaryHebb{Float}
+    θx::Float = 0.5
+    qltp::Float = 1e-3
+    qltd::Float = 1e-3
+    qdec::Float = 1e-3
+end
+
+learn{Float}(::Type{QPostSubTernaryHebb{Float}}) = quote
+    x = $Float(z_pre)
+    y = $Float(I_post)
+
+    dw_ltp = qltp * (x >= θx) * (z_post >= θz_post)
+    dw_ltd = qltd * (x < θx) * (z_post >= θz_post)
+    dw_dec = qdec * (x >= θx) * y * (z_post < θz_post)
+    w = clamp(w + η_post * (dw_ltp - dw_ltd - dw_dec), zero(w), one(w))
+end
+
+
 # =======================================================
 # Presynaptically-gated Hebb rule with subtractive decay
 # =======================================================
