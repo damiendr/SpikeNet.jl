@@ -18,8 +18,9 @@ end
 # Rules for ff exc/inh
 # =======================================================
 
-
-import ISPC:case
+@fastmath @inline function iftrue(x::Bool, a)
+    x * a
+end
 
 @with_kw type QPreSubTernary{Float}
     qplus::Float = 1e-3
@@ -29,8 +30,8 @@ end
 learn{Float}(::Type{QPreSubTernary{Float}}) = quote
     x = $Float(z_pre)
     y = $Float(I_post)
-    dwplus = case((z_post < θz_post), qplus * x * y)
-    dwmin = case((z_post >= θz_post), qmin * x * y)
+    dwplus = iftrue((z_post < θz_post), qplus * x * y)
+    dwmin = iftrue((z_post >= θz_post), qmin * x * y)
     w = clamp(w + η_post * (dwplus - dwmin), zero(w), one(w))
 end
 
@@ -44,8 +45,8 @@ end
 learn{Float}(::Type{QPostSubHebb{Float}}) = quote
     x = $Float(z_pre)
     z = $Float(z_post)
-    dwplus = case((x >= θx), qplus * z)
-    dwmin = case((x < θx), qmin * z)
+    dwplus = iftrue((x >= θx), qplus * z)
+    dwmin = iftrue((x < θx), qmin * z)
     w = clamp(w + η_post * (dwplus - dwmin), zero(w), one(w))
 end
 
@@ -61,11 +62,11 @@ learn{Float}(::Type{QPostSubTernaryHebb{Float}}) = quote
     x = $Float(z_pre)
     y = $Float(I_post)
 
-    dw_ltp = case((x >= θx) && (z_post >= θz_post),
+    dw_ltp = iftrue((x >= θx) && (z_post >= θz_post),
                     qltp)
-    dw_ltd = case((x < θx) && (z_post >= θz_post),
+    dw_ltd = iftrue((x < θx) && (z_post >= θz_post),
                     qltd)
-    dw_dec = case((x >= θx) && (y > zero($Float)) && (z_post < θz_post),
+    dw_dec = iftrue((x >= θx) && (y > zero($Float)) && (z_post < θz_post),
                     qdec)
     w = clamp(w + η_post * (dw_ltp - dw_ltd - dw_dec), zero(w), one(w))
 end
@@ -115,8 +116,8 @@ end
 learn{Float}(::Type{PreGatedMultQHebb{Float}}) = quote
     x = $Float(z_pre)
     y = $Float(z_post)
-    dw_plus = case((y >= θ), q_plus * x)
-    dw_min = case((y < θ), q_min * x)
+    dw_plus = iftrue((y >= θ), q_plus * x)
+    dw_min = iftrue((y < θ), q_min * x)
     dw = dw_plus * (w_max - w) - dw_min * (w - w_min)
     w = clamp(w + dw, w_min, w_max)
 end
