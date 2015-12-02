@@ -1,8 +1,5 @@
 module SpikeNet
 
-@fastmath @inline function F(x::Bool)
-    Float32(x)
-end
 
 include("Synapses.jl")
 export ExponentialInhSynapses, ThetaSynapses

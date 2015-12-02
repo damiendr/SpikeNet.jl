@@ -1,5 +1,9 @@
 using Parameters
 
+@fastmath @inline function F(x::Bool)
+    Float32(x)
+end
+
 @with_kw type AdaptiveDendrites
     g::Array{Float32,1} # total active conductance
     θg::Array{Float32,1} # dendritic thresholds

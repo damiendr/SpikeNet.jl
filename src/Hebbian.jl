@@ -1,6 +1,9 @@
 
 using Parameters
 
+@fastmath @inline function F(x::Bool)
+    Float32(x)
+end
 
 @with_kw type PreQHebb{Float}
     θ::Float = 0.5
