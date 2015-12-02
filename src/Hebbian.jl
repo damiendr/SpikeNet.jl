@@ -61,7 +61,7 @@ learn{Float}(::Type{QPostSubTernaryHebb{Float}}) = quote
     x = $Float(z_pre)
     y = $Float(I_post)
 
-    dw_ltp = qltp * y * F(x >= θx)
+    dw_ltp = qltp * y * F((x >= θx) & (z_post >= θz_post))
     dw_ltd = qltd * y * F(x < θx)
     dw_dec = qdec * y * F((x >= θx) & (z_post < θz_post))
     w = clamp(w + η_post * (dw_ltp - dw_ltd - dw_dec), zero(w), one(w))
