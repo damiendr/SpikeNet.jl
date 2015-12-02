@@ -31,8 +31,8 @@ input_start(::Type{AdaptiveDendrites}) = quote
 end
 
 update(::Type{AdaptiveDendrites}) = quote
-    I = (g > θg) * (I0 + Ig * g)
-    qθ = qplusθ * (g > (θg + θhyst)) - qminθ * (g < θg)
+    I = F(g > θg) * (I0 + Ig * g)
+    qθ = qplusθ * F(g > (θg + θhyst)) - qminθ * F(g < θg)
     θg = clamp(θg + qθ * η, θmin, θmax)
 end
 
@@ -43,7 +43,7 @@ on_spike(::Type{AdaptiveDendrites}) = quote
 end
 
 learn_post(::Type{AdaptiveDendrites}) = quote
-    qη = qη_assoc * I * (θz - z_post) + qη_forget
+    qη = qη_assoc * I * F(θz - z_post) + qη_forget
     η = clamp(η + qη, zero(η), one(η))
 end
 

@@ -18,10 +18,6 @@ end
 # Rules for ff exc/inh
 # =======================================================
 
-@fastmath @inline function F(x::Bool)
-    Float32(x)
-end
-
 @with_kw type QPreSubTernary{Float}
     qplus::Float = 1e-3
     qmin::Float = 1e-3
