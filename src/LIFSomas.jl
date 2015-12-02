@@ -25,8 +25,10 @@ function LIFSomas(n::Int; τ=10e-3, θ=0.8, kρ=0.8, jitter=0.1, kwargs...)
 
     # Add some jitter around these parameters for population diversity:
     τ_ = gauss(Float32, n, τ, τ * jitter)
-    θ_ = gauss(Float32, n, θ, θ * jitter)
-    ρ_ = θ_ .* gauss(Float32, n, kρ, kρ * jitter)
+    θ_ = ones(Float32, n) * θ
+    ρ_ = ones(Float32, n) * ρ
+#    θ_ = gauss(Float32, n, θ, θ * jitter)
+#    ρ_ = θ_ .* gauss(Float32, n, kρ, kρ * jitter)
 
     LIFSomas(Id=Id, Is=Is, Itot=Itot, u=u, z=z, r=r, τ=τ_, θ=θ_, ρ=ρ_;
         kwargs...)
