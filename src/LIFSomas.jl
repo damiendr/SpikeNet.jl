@@ -43,7 +43,7 @@ update(::Type{LIFSomas}) = quote
     I = Id + Is + Ileak
     Itot += I
     du = I * dt/τ
-    u = clamp(u + du, zero(u), one(u))
+    u = clamp(u + du, zero(u), θ)
 end
 
 spike(::Type{LIFSomas}) = :((u >= θ) && (r <= zero(r)))
