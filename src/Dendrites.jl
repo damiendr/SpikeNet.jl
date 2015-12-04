@@ -16,7 +16,8 @@ end
     qminθ::Float32 = 1e-3 # threshold decrement
     I0::Float32 = 1.0 # current bias
     Ig::Float32 = 0.1 # current slope
-    qη_assoc::Float32 = 1e-3
+    qη_inc::Float32 = 1e-3
+    qη_dec::Float32 = 1e-3
     qη_forget::Float32 = 1e-6
     θz::Float32 = 3.0
 end
@@ -48,7 +49,7 @@ learn_post(::Type{AdaptiveDendrites}) = quote
     qθ = qplusθ * F((g > (θg + θhyst)) & (z_post < θz)) - qminθ * F(g < θg)
     θg = clamp(θg + qθ * η, θmin, θmax)
 
-    qη = qη_assoc * I * (θz - z_post) + qη_forget
+    qη = I * (z_post >= θz ? -qη_dec : qη_inc) + qη_forget
     η = clamp(η + qη, zero(η), one(η))
 end
 
