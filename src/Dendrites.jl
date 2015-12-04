@@ -20,6 +20,7 @@ end
     qη_dec::Float32 = 1e-3
     qη_forget::Float32 = 1e-6
     θz::Float32 = 3.0
+    lazy_θ::Bool = true
 end
 Base.length(d::AdaptiveDendrites) = length(d.g)
 
@@ -46,7 +47,7 @@ on_spike(::Type{AdaptiveDendrites}) = quote
 end
 
 learn_post(::Type{AdaptiveDendrites}) = quote
-    qθ = qplusθ * F((g > (θg + θhyst)) & (z_post < θz)) - qminθ * F(g < θg)
+    qθ = qplusθ * F((g > (θg + θhyst)) & ((z_post > θz) $ lazy_θ)) - qminθ * F(g < θg)
     θg = clamp(θg + qθ * η, θmin, θmax)
 
     qη = I * (z_post >= θz ? -qη_dec : qη_inc) + qη_forget
