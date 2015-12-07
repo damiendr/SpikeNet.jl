@@ -9,7 +9,7 @@ end
     θg::Array{Float32,1} # dendritic thresholds
     I::Array{Float32,1} # dendritic current
     η::Array{Float32,1} # metaplastic state
-    θhyst::Float32 = 0.1 # threshold hysteresis
+    ghyst::Float32 = 0.1 # threshold hysteresis
     θmin::Float32 = 0.01 # min threshold
     θmax::Float32 = Inf # max threshold
     qplusθ::Float32 = 1e-3 # threshold increment
@@ -47,7 +47,10 @@ on_spike(::Type{AdaptiveDendrites}) = quote
 end
 
 learn_post(::Type{AdaptiveDendrites}) = quote
-    qθ = qplusθ * F((g > (θg + θhyst)) & ((z_post > θz) $ lazy_θ)) - qminθ * F(g < θg)
+    qθ = qplusθ * F(((g - ghyst) >= θg) & ((z_post >= θz) $ lazy_θ))
+         - qplusθ * F(((g - ghyst) < θg) & ((z_post > θz) $ lazy_θ))
+         - qminθ * F(g < θg)
+#    qθ = qplusθ * F((g > (θg + θhyst)) & ((z_post > θz) $ lazy_θ)) - qminθ * F(g < θg)
     θg = clamp(θg + qθ * η, θmin, θmax)
 
     qη = I * (z_post >= θz ? -qη_dec : qη_inc) + qη_forget
