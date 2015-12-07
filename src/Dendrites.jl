@@ -47,9 +47,9 @@ on_spike(::Type{AdaptiveDendrites}) = quote
 end
 
 learn_post(::Type{AdaptiveDendrites}) = quote
-    qθ = qplusθ * F(((g - ghyst) >= θg) & ((z_post >= θz) $ lazy_θ))
+    qθ = (qplusθ * F(((g - ghyst) >= θg) & ((z_post >= θz) $ lazy_θ))
          - qplusθ * F(((g - ghyst) < θg) & ((z_post > θz) $ lazy_θ))
-         - qminθ * F(g < θg)
+         - qminθ * F(g < θg))
 #    qθ = qplusθ * F((g > (θg + θhyst)) & ((z_post > θz) $ lazy_θ)) - qminθ * F(g < θg)
     θg = clamp(θg + qθ * η, θmin, θmax)
 
