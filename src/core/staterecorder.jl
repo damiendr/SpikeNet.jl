@@ -1,5 +1,6 @@
+# State Monitors organised as Dicts of Arrays.
 
-type RecordedData{S,T,R}
+type RecordedState{S,T,R}
     instance::T
     arrays::Dict{Symbol,Array}
     steps::R
@@ -12,7 +13,7 @@ Creates a structure that will hold recorded data.
 
 Recording `obj.a` and `obj.b` at timesteps 100 to 1000:
 
-    r = RecordedData(obj, 100:1000, :a, :b)
+    r = RecordedState(obj, 100:1000, :a, :b)
     for step in 1:N
         record(r, step)
     end
@@ -29,7 +30,7 @@ Accessing timestamps:
     timestamps(r, dt)
 
 """
-function RecordedData(instance, steps, fields...)
+function RecordedState(instance, steps, fields...)
     arrays = Dict()
     cols = length(steps)
     for sym in fields
@@ -48,14 +49,14 @@ function RecordedData(instance, steps, fields...)
     # We use the Val{} trick to store the field symbols in the type
     # parameters. This allows the @generated record() function below
     # to specialise for a specific list of fields.
-    return RecordedData{Val{fields}, typeof(instance), typeof(steps)}(
+    return RecordedState{Val{fields}, typeof(instance), typeof(steps)}(
                         instance, arrays, steps, 0, start(steps))
 end
 
 """
 Resets recorded data.
 """
-function reset!(rec::RecordedData)
+function reset!(rec::RecordedState)
     rec.idx = 0
     rec.next = start(rec.steps)
     for arr in values(rec.arrays)
@@ -66,7 +67,7 @@ end
 """
 Returns the timestamps corresponding to the recorded timesteps.
 """
-timestamps(rec::RecordedData, dt) = rec.steps * dt
+timestamps(rec::RecordedState, dt) = rec.steps * dt
 
 
 quoted(expr) = Expr(:quote, expr)
@@ -74,7 +75,7 @@ quoted(expr) = Expr(:quote, expr)
 """
 Signals that there is new data to be recorded for timestep `step`.
 """
-@generated function record!{syms}(data::RecordedData{Val{syms}}, step)
+@generated function record!{syms}(data::RecordedState{Val{syms}}, step)
     record_statements = []
     for var in syms
         sym = quoted(var)

@@ -1,3 +1,4 @@
+# State Monitors organised as Arrays of Arrays.
 
 type RecordedData{S,T,U<:Tuple}
     instance::T

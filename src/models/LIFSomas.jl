@@ -61,3 +61,6 @@ reset(::Type{LIFSomas}) = quote
 end
 
 rates(somas::LIFSomas) = somas.z
+
+
+

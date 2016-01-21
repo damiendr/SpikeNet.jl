@@ -1,38 +1,16 @@
 module SpikeNet
 
+include("core/elementwise.jl")
 
-include("Synapses.jl")
-export ExponentialInhSynapses, ThetaSynapses
+include("core/densepathway.jl")
+export DensePathway
+export route_rates!, route_spikes!, learn!
 
-include("Dendrites.jl")
-export AdaptiveDendrites
+include("core/groups.jl")
+export update!
 
-include("LIFSomas.jl")
-export LIFSomas
-
-include("ReLU.jl")
-export RectLinUnits
-
-include("Hebbian.jl")
-export QPreSubTernary, QPostSubHebb, PreGatedMultQHebb, QPostSubTernaryHebb
-
-include("Pathways.jl")
-export DensePathway, route_rates!, route_sparse_rates!, route_sparse_rates!, route_spikes!, learn!
-
-include("Elementwise.jl")
-
-include("Groups.jl")
-export update!, reset!, input_start!, add_current!, learn_post!
-
-include("Input.jl")
-export InputUnits, DatasetInput, set_rates!
-
-include("DMonitors.jl")
-export record!, reset!, timestamps, RecordedData
-
-include("SpikeRecorder.jl")
-export record!, reset!, timestamps, RecordedSpikes
-
-include("Utils.jl")
+include("core/staterecorder.jl")
+include("core/spikerecorder.jl")
+export record!, RecordedSpikes, RecordedState
 
 end
