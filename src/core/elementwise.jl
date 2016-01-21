@@ -19,6 +19,8 @@ ImplicitFields.list_fields{T}(E::Elemwise{T}) = ImplicitFields.list_fields(T)
 function ImplicitFields.get_field{T,I}(E::Elemwise{T,I}, field::Symbol)
     path = :($(E.source).$(field))
     FT = fieldtype(T,field)
+    unpacked = Symbol(Base.replace(string(path), ".", "__"))
+    indexed = :($unpacked)
 
     # Special case for dense arrays:
     if issubtype(FT, DenseArray)
@@ -27,16 +29,15 @@ function ImplicitFields.get_field{T,I}(E::Elemwise{T,I}, field::Symbol)
         if field_dims == elemwise_dims
             # The dimensions match our indices, let's access
             # the corresponding element:
-            path = :($(path)[$(I.parameters...)])
+            indexed = :($unpacked[$(I.parameters...)])
         elseif field_dims == 0
             # This is a zero-dimensional array, acting as a
             # container:
-            path = :($(path)[])
+            indexed = :($unpacked[])
         end
     end
-    access = Symbol(Base.replace(string(path), ".", "__"))
-    push!(E.decls, (access, path, T, FT))
-    access
+    push!(E.decls, (unpacked, path, T, FT))
+    indexed
 end
 
 function Base.getindex{T,I}(E::Elemwise{T,I}, field::Symbol)
