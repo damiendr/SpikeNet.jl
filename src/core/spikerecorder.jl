@@ -22,6 +22,16 @@ function RecordedSpikes(instance, steps)
     else
         TT = eltype(steps)
     end
+    if issubtype(TT, AbstractFloat)
+        # `steps` is most likely a FloatRange. Don't do that!
+        # - you might want to start recording from t = 10.0 s,
+        # an exact multiple of your dt = 0.5 ms, but that exact
+        # value will never be reached through repeated addition.
+        # - floating point numbers are not uniformly distributed.
+        # The imprecision on the actual dt will increase with t.
+        warn("Using a floating point representation for time will ",
+             "cause problems. Use integer/fixed point numbers.")
+    end
     TI = choose_uint_type(length(instance))
 
     ts = Array(TT, 0)
@@ -46,15 +56,14 @@ function reset!(r::RecordedSpikes)
 end
 
 @generated function record!{T}(data::RecordedSpikes{T}, step)
-    decls = Dict()
-    unpack!(decls, T, :group, :i)
-    spike_expr = map_fields(spike(T), decls, :group => "")
+    decls = Set()
+    spike_expr = has_spike(Elemwise(decls, T, :group, :i))
     gen_func = quote
         $(Expr(:meta, :inline))
         $(Expr(:meta, :fastmath))
         if step in data.steps
             group = data.instance
-            $(declare(decls)...)
+            $(unpack_fields(decls)...)
             ts = data.ts
             id = data.id
             for i in 1:length(group)

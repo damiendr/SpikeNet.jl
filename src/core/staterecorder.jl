@@ -69,7 +69,6 @@ Returns the timestamps corresponding to the recorded timesteps.
 """
 timestamps(rec::RecordedState, dt) = rec.steps * dt
 
-
 quoted(expr) = Expr(:quote, expr)
 
 """
@@ -94,5 +93,26 @@ Signals that there is new data to be recorded for timestep `step`.
     end
     # println(func)
     func
+end
+
+
+# No-op implementation: record nothing.
+record!(r::Void, step) = nothing
+
+
+@generated function record!(recorders::Tuple, step)
+    recs = [:(SpikeNet.record!(recorders[$i], step))
+            for i in 1:length(recorders.types)]
+    quote
+        $(recs...)
+    end
+end
+
+@generated function reset!(recorders::Tuple)
+    recs = [:(SpikeNet.reset!(recorders[$i]))
+            for i in 1:length(recorders.types)]
+    quote
+        $(recs...)
+    end
 end
 

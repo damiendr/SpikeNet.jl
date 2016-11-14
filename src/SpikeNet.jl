@@ -1,9 +1,12 @@
 module SpikeNet
 
+include("core/utils.jl")
+export powi
+
 include("core/elementwise.jl")
 
 include("core/densepathway.jl")
-export DensePathway
+export DensePathway, SimpleDensePathway
 export route_rates!, route_spikes!, learn!
 
 include("core/groups.jl")

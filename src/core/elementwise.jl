@@ -50,7 +50,7 @@ end
 
 function unpack_fields(decls::Set)
     field_decls = []
-    for (access, path, T, FT) in decls
+    for (access, path, T, FT) in sort([decls...])
         push!(field_decls, :($access = $path))
     end
     field_decls
@@ -58,7 +58,7 @@ end
 
 function collect_fields(decls::Set)
     field_decls = []
-    for (access, path, T, FT) in decls
+    for (access, path, T, FT) in sort([decls...])
         # Arrays get modified in-place, but for other
         # types (eg. scalars) we need to re-pack the
         # values into the struct:
