@@ -5,7 +5,7 @@ SpikeNet is a minimalist neural network simulator written in Julia. It is meant 
 
 SpikeNet does a lot less than other simulators. In fact it's hardly a simulator at all! There is no main loop, only a collection of tools that you can use to turn a set of model equations into a working simulation:
 
-- elementwise kernels with a syntax insipred by Brian
+- elementwise kernels with a syntax inspired by Brian
 - running kernels on populations
 - running kernels on pathways
 - recording state
