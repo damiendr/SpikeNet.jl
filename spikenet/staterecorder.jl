@@ -1,11 +1,12 @@
-# State Monitors organised as Dicts of Arrays.
+# Records state from a population.
+# Data is recorded as a dict of arrays.
 
-type RecordedState{S,T,R}
+mutable struct RecordedState{S,T,R,IS}
     instance::T
     arrays::Dict{Symbol,Array}
     steps::R
     idx::Int
-    next::Int
+    state::IS
 end
 
 """
@@ -39,18 +40,17 @@ function RecordedState(instance, steps, fields...)
         # we want to record, and an extra dimension corresponding
         # to time:
         if isa(field, AbstractArray) # array field
-            arr = similar(field, (length(field), cols))
+            arr = zeros(eltype(field), size(field)..., cols)
         else # scalar field
-            arr = Array(typeof(field), (1,cols))
+            arr = zeros(typeof(field), cols)
         end
-        arr[:] = zero(eltype(arr))
         arrays[sym] = arr
     end
     # We use the Val{} trick to store the field symbols in the type
     # parameters. This allows the @generated record() function below
     # to specialise for a specific list of fields.
-    return RecordedState{Val{fields}, typeof(instance), typeof(steps)}(
-                        instance, arrays, steps, 0, start(steps))
+    state = start(steps)
+    return RecordedState{Val{fields}, typeof(instance), typeof(steps), typeof(state)}(instance, arrays, steps, 0, state)
 end
 
 """
@@ -58,9 +58,9 @@ Resets recorded data.
 """
 function reset!(rec::RecordedState)
     rec.idx = 0
-    rec.next = start(rec.steps)
+    rec.state = start(rec.steps)
     for arr in values(rec.arrays)
-        arr[:] = zero(eltype(arr))
+        arr .= zero(eltype(arr))
     end
 end
 
@@ -71,48 +71,45 @@ timestamps(rec::RecordedState, dt) = rec.steps * dt
 
 quoted(expr) = Expr(:quote, expr)
 
+
+# Helper functions to efficiently perform the copy:
+#   a[:,...,:,i] = b[:,...,:]
+function copyslice(a::AbstractArray, b::AbstractArray, i)
+    R = CartesianRange(size(b))
+    @inbounds for I in R
+        a[I,i] = b[I]
+    end
+end
+function copyslice(a::AbstractArray{T}, b::T, i) where {T}
+    a[i] = b
+end
+
+
 """
 Signals that there is new data to be recorded for timestep `step`.
 """
-@generated function record!{syms}(data::RecordedState{Val{syms}}, step)
+@generated function record!(data::RecordedState{Val{syms}}, step) where {syms}
     record_statements = []
     for var in syms
-        sym = quoted(var)
-        rec = :(data.arrays[$sym][:,data.idx] = data.instance.$var[:])
-        push!(record_statements, rec)
+        push!(record_statements, quote
+            copyslice(data.arrays[$(QuoteNode(var))], data.instance.$var, data.idx)
+        end)
     end
     func = quote
         $(Expr(:meta, :inline))
         $(Expr(:meta, :fastmath))
-        if step == data.next && !done(data.steps, step)
-            data.idx += 1
-            $(record_statements...)
-            (step_idx, next_idx) = next(data.steps, step)
-            data.next = next_idx
+        if !done(data.steps, data.state)
+            next_step, next_state = next(data.steps, data.state)
+            if step == next_step
+                data.idx += 1
+                $(record_statements...)
+                data.state = next_state
+            end
         end
+        nothing
     end
     # println(func)
     func
 end
 
-
-# No-op implementation: record nothing.
-record!(r::Void, step) = nothing
-
-
-@generated function record!(recorders::Tuple, step)
-    recs = [:(SpikeNet.record!(recorders[$i], step))
-            for i in 1:length(recorders.types)]
-    quote
-        $(recs...)
-    end
-end
-
-@generated function reset!(recorders::Tuple)
-    recs = [:(SpikeNet.reset!(recorders[$i]))
-            for i in 1:length(recorders.types)]
-    quote
-        $(recs...)
-    end
-end
 
