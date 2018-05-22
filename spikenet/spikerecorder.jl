@@ -3,8 +3,8 @@
 struct RecordedSpikes{T,R,TT,TI}
     instance::T # the object we're recording from
     steps::R # the timesteps to record
-    ts::Array{TT,1} # timesteps of recorded spikes
-    id::Array{TI,1} # indices of recorded spikes
+    ts::Vector{TT} # timesteps of recorded spikes
+    id::Vector{TI} # indices of recorded spikes
 end
 
 function choose_uint_type(max_val)
@@ -16,6 +16,7 @@ function choose_uint_type(max_val)
     throw(OverflowError())
 end
 
+
 function RecordedSpikes(instance, steps)
     # Choose a compact representation for the data we'll have to store:
     # if issubtype(eltype(steps), Int)
@@ -26,10 +27,10 @@ function RecordedSpikes(instance, steps)
     # TI = choose_uint_type(length(instance))
 
     TT = eltype(steps)
-    TI = Int
+    TI = Int32
 
-    ts = Array{TT}(0)
-    id = Array{TI}(0)
+    ts = Vector{TT}()
+    id = Vector{TI}()
 
     # Let's pre-allocate a sensible chunk of memory, assuming
     # a 1/1000 spike probability per timestep:
@@ -44,10 +45,14 @@ end
 
 timestamps(r::RecordedSpikes, dt) = r.ts * dt
 
+
 function reset!(r::RecordedSpikes)
-    r.ts = Array(eltype(r.ts), 0)
-    r.id = Array(eltype(r.id), 0)
+    empty!(r.ts)
+    empty!(r.id)
 end
+
+
+@inline record!(data::Void, step, has_spike) = nothing
 
 @inline function record!{T}(data::RecordedSpikes{T}, step, has_spike)
     if step in data.steps

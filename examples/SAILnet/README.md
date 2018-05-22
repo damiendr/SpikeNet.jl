@@ -1,8 +1,8 @@
 # SAILnet
 
-This is a reimplementation of the model described in Zylberberg, Murphy & DeWeese (2011)[^1]
+This is a reimplementation of the SAILnet model:
 
-^1: Zylberberg, J., Murphy, J. T., & DeWeese, M. R. (2011). A Sparse Coding Model with Synaptically Local Plasticity and Spiking Neurons Can Account for the Diverse Shapes of V1 Simple Cell Receptive Fields. PLoS Computational Biology, http://doi.org/10.1371/journal.pcbi.1002250
+    Zylberberg, J., Murphy, J. T., & DeWeese, M. R. (2011). *A Sparse Coding Model with Synaptically Local Plasticity and Spiking Neurons Can Account for the Diverse Shapes of V1 Simple Cell Receptive Fields.* PLoS Computational Biology, http://doi.org/10.1371/journal.pcbi.1002250
 
 This implementation is known to differ from the published work in the following aspects:
 

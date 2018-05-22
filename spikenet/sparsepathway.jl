@@ -27,9 +27,9 @@ function Base.broadcast(f, path::SparsePathway, select=(_)->true)
     k = 0
     for i in eachindex(path.pre)
         if select(Elem(path.pre,i))
-            @inbounds @simd for l in eachindex(path.targets[i])
-                f(Elem(path.pre, i), Elem(path.syns, k+l),
-                  Elem(path.post, path.targets[i][l]))
+            @inbounds @simd for j in eachindex(path.targets[i])
+                f(Elem(path.pre, i), Elem(path.syns, k+j),
+                  Elem(path.post, path.targets[i][j]))
             end
         end
         k += length(path.targets[i])
