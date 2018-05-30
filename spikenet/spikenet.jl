@@ -4,8 +4,8 @@ module SpikeNet
 
 include("elemwise.jl")
 
-abstract type Pathway end
-export Pathway
+# abstract type Pathway end
+# export Pathway
 
 function record! end
 record!(r::Void, step) = nothing
@@ -17,11 +17,14 @@ export reset!
 include("population.jl")
 export Group
 
-include("densepathway.jl")
-export DensePathway
+include("pathways.jl")
+export Pathway, Dense, Sparse, FanIn, FanOut, dispatch_pre, dispatch_post
 
-include("sparsepathway.jl")
-export SparsePathway
+# include("densepathway.jl")
+# export DensePathway
+
+# include("sparsepathway.jl")
+# export SparsePathway
 
 include("spikerecorder.jl")
 export RecordedSpikes

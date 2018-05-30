@@ -48,3 +48,14 @@ function Base.broadcast(f, g::Group, g2::Group)
     nothing
 end
 
+function Base.broadcast(f, g::Group, g2::Group, test)
+    @assert size(g) == size(g2)
+    @inbounds @simd for i in eachindex(g)
+        if test(Elem(g,i))
+            f(Elem(g,i), Elem(g2,i))
+        end
+    end
+    nothing
+end
+
+

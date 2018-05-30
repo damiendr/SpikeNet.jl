@@ -10,8 +10,10 @@ struct Elem{T,N}
     o::T
     i::Tuple{Vararg{Int,N}}
 end
-Elem(T,i::Vararg{Int}) = Elem(T,i)
 export Elem
+
+Elem(T,i::Vararg{Int}) = Elem(T,i)
+Base.getindex(e::Elem, f::Symbol) = getfield(e.o, f)[e.i...]
 
 
 """
