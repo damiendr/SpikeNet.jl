@@ -1,0 +1,7 @@
+name = "SpikeNet"
+uuid = "1ba5f6e0-9f04-11e8-2ee9-0d99bf392e5b"
+authors = ["Damien Drix <damien.drix@gmail.com>"]
+version = "0.2.0"
+
+[deps]
+Images = "916415d5-f1e6-5110-898d-aaa5f9f070e0"
