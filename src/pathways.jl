@@ -16,29 +16,32 @@
 
 abstract type Pathway end
 
+import SpikeNet.Connectivity
+
 """
 Describes a dense pathway where there is a connection between
 every pair of (pre, post) neurons. The synapses form a matrix
-with one column per post-synaptic cell. The layout means that
-pre-gated dispatch will be ~3x faster than post-gated dispatch.
+with one column per post-synaptic cell. With that layout, pre-
+gated dispatch will be ~3x faster than post-gated dispatch.
 """
 struct Dense{S<:Group} <: Pathway
     syns::S     # the synapses as a matrix[post][pre].
 end
 
 """ Indices `m` of the targets for the pre-synaptic neuron `i`. """
-target_indices(path::Dense, i) = indices(path.syns,1)
+@inline target_indices(path::Dense, i) = axes(path.syns,1)
 """ Indices `n` of the sources for the post-synaptic neuron `j`. """
-source_indices(path::Dense, j) = indices(path.syns,2)
+@inline source_indices(path::Dense, j) = axes(path.syns,2)
 
-""" `Elem` for the `m`th synapse of pre-synaptic neuron `i`. """
-post_syn(path::Dense, i, m) = Elem(path.syns, m, i)
-""" `Elem` for the `m`th post-synaptic cell of pre-synaptic neuron `i`. """
-post_cell(path::Dense, post, i, m) = Elem(post, m)
-""" `Elem` for the `n`th synapse of post-synaptic neuron `j`. """
-pre_syn(path::Dense, n, j) = Elem(path.syns, j, n)
-""" `Elem` for the `n`th pre-synaptic of post-synaptic neuron `j`. """
-pre_cell(path::Dense, pre, n, j) = Elem(pre, n)
+""" `Elem` for the `m`th target synapse of pre-synaptic neuron `i`. """
+@inline post_syn(path::Dense, i, m) = Elem(path.syns, m, i)
+""" `Elem` for the `m`th target cell of pre-synaptic neuron `i`. """
+@inline post_cell(path::Dense, post, i, m) = Elem(post, m)
+""" `Elem` for the `n`th source synapse of post-synaptic neuron `j`. """
+@inline pre_syn(path::Dense, n, j) = Elem(path.syns, j, n)
+""" `Elem` for the `n`th source cell of post-synaptic neuron `j`. """
+@inline pre_cell(path::Dense, pre, n, j) = Elem(pre, n)
+
 
 
 """
@@ -83,6 +86,33 @@ pre_cell(path::Sparse, pre, n, j) = nothing
 # If needed, use a DynSparse pathway instead.
 
 
+function Sparse(pre::Group, syns::Group, post::Group, contacts::Vector{Tuple{I,I}}) where {I<:Integer}
+    if length(syns) != length(contacts)
+        error("syns and contacts have different lengths: $(length(syns)), $(length(contacts))")
+    end
+
+    post_cells = [Int[] for _ in eachindex(pre)]
+    syn_offsets = [0 for _ in eachindex(pre)]
+    pre_syns = [Int[] for _ in eachindex(post)]
+
+    for (i,j) in contacts
+        push!(post_cells[i],j)
+    end
+
+    k = 0
+    for i in eachindex(pre)
+        sort!(post_cells[i])
+        syn_offsets[i] = k
+        for j in post_cells[i]
+            k += 1
+            push!(pre_syns[j],k)
+        end
+    end
+
+    Sparse(syns, post_cells, syn_offsets, pre_syns)
+end
+
+
 """
 A sparse pathway variant where the insertion of new synapses is
 cheap, at the cost of increased memory use. Synapses are stored
@@ -112,7 +142,7 @@ end
 
 
 """
-Pre-gated pathway update: call `f(pre,syn,post,...)` for
+Pre-gated pathway update: call `f(pre,syn,post,args...)` for
 every connection in the pathway where select(pre) is true.
 """
 @generated function dispatch_pre(f, pre, path::Pathway, post, select::Function, args...)
@@ -126,7 +156,7 @@ every connection in the pathway where select(pre) is true.
             if select(source)
                 @simd for m in target_indices(path, i)
                     # @simd should work at least for dense pathways.
-                    syn = pre_syn(path, i, m)
+                    syn = post_syn(path, i, m)
                     target = post_cell(path, post, i, m)
                     f(source, syn, target, $(varargs...))
                 end
@@ -137,7 +167,7 @@ every connection in the pathway where select(pre) is true.
 end
 
 """
-Post-gated pathway update: call `f(pre,syn,post,...)` for
+Post-gated pathway update: call `f(pre,syn,post,args...)` for
 every connection in the pathway where select(post) is true.
 """
 @generated function dispatch_post(f, pre, path::Pathway, post, select::Function, args...)
@@ -149,7 +179,7 @@ every connection in the pathway where select(post) is true.
                 @simd for n in source_indices(path, j)
                     # @simd is not expected to do much here because of
                     # unfavourable memory access patterns.
-                    syn = post_syn(path, n, j)
+                    syn = pre_syn(path, n, j)
                     source = pre_cell(path, pre, n, j)
                     f(source, syn, target, $(varargs...))
                 end
@@ -159,12 +189,9 @@ every connection in the pathway where select(post) is true.
     end
 end
 
-Base.broadcast(f, select::Function, pre::Group, path::Pathway, post::Group, args...) = dispatch_pre(f, pre, path, post, select, args...)
-Base.broadcast(f, pre::Group, path::Pathway, post::Group, select::Function, args...) = dispatch_post(f, pre, path, post, select, args...)
-Base.broadcast(f, pre::Group, path::Pathway, post::Group, args...) = dispatch_pre(f, pre, path, post, (_)->true, args...)
+import Base.Broadcast.broadcasted
 
-function Base.rem(f::Function, args::Tuple{<:Function, <:Group, <:Pathway, <:Group})
-    select, pre, path, post = args
-    dispatch_pre(f, pre, path, post, select)
-end
+broadcasted(f, select::Function, pre::Group, path::Pathway, post::Group, args...) = dispatch_pre(f, pre, path, post, select, args...)
+broadcasted(f, pre::Group, path::Pathway, post::Group, select::Function, args...) = dispatch_post(f, pre, path, post, select, args...)
+broadcasted(f, pre::Group, path::Pathway, post::Group, args...) = dispatch_pre(f, pre, path, post, (_)->true, args...)
 

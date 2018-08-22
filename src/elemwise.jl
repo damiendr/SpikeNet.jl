@@ -69,12 +69,12 @@ function resolve(code, mappings...)
     # Always inline this function. This is critical for speed,
     # because it lets the compiler simplify away all these Elem
     # wrappers, avoiding memory allocation in the elemwise loop.
+    # Since Julia 0.7 we also need :propagate_inbounds for @simd
+    # to work with an inlined function.
     return quote
-        $(Expr(:meta, :inline))
+        $(Expr(:meta, :inline, :propagate_inbounds))
         @fastmath $ast
     end
-    # Currently there's no way to let the caller decide:
-    # @inline @generated f(...)=@resolve(...) won't work!
 end
 
 function matched(field, suffix)
@@ -98,7 +98,7 @@ function make_subs(E::Type{<:Elem}, elem::Symbol, suffix::Symbol,
     for field in fieldnames(T)
         # Decide what to do based on the type of the field:
         F = fieldtype(T, field)
-        if issubtype(F, AbstractArray)
+        if F <: AbstractArray
             # Arrays contain element values:
             subs[matched(field, suffix)] = :($elem.o.$field[CartesianIndex($elem.i)])
             # TODO check that dimensions match?

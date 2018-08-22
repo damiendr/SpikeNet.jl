@@ -29,22 +29,24 @@ end
     :(eachindex(g.$X))
 end
 
-@generated function Base.indices(g::Group{X}, d) where {X}
-    :(indices(g.$X, d))
+@generated function Base.axes(g::Group{X}, d) where {X}
+    :(axes(g.$X, d))
 end
 
 @generated function Base.getindex(g::Group{X},i...) where {X}
     :(Elem(g,i))
 end
 
-function Base.broadcast(f, g::Group)
+import Base.Broadcast.broadcasted
+
+function broadcasted(f, g::Group)
     @inbounds @simd for i in eachindex(g)
         f(Elem(g,i))
     end
     nothing
 end
 
-function Base.broadcast(f, g::Group, test::Function)
+function broadcasted(f, g::Group, test::Function)
     @inbounds @simd for i in eachindex(g)
         if test(Elem(g,i))
             f(Elem(g,i))
@@ -53,7 +55,7 @@ function Base.broadcast(f, g::Group, test::Function)
     nothing
 end
 
-function Base.broadcast(f, g::Group, g2::Group)
+function broadcasted(f, g::Group, g2::Group)
     @assert size(g) == size(g2)
     @inbounds @simd for i in eachindex(g)
         f(Elem(g,i), Elem(g2,i))
@@ -61,7 +63,7 @@ function Base.broadcast(f, g::Group, g2::Group)
     nothing
 end
 
-function Base.broadcast(f, g::Group, g2::Group, x)
+function broadcasted(f, g::Group, g2::Group, x)
     @assert size(g) == size(g2)
     @inbounds @simd for i in eachindex(g)
         f(Elem(g,i), Elem(g2,i), x)
@@ -69,7 +71,7 @@ function Base.broadcast(f, g::Group, g2::Group, x)
     nothing
 end
 
-function Base.broadcast(f, g::Group, g2::Group, test::Function)
+function broadcasted(f, g::Group, g2::Group, test::Function)
     @assert size(g) == size(g2)
     @inbounds @simd for i in eachindex(g)
         if test(Elem(g2,i))
